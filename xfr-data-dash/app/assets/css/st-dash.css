@@ -1,0 +1,133 @@
+
+/*Estilo deel contenedor*/
+.frctl.std{
+    margin: 0 -40px;
+    width: calc(100% + 80px);
+    box-sizing: border-box;
+}
+
+/* Estilo de los scrools en los cuadrantes*/
+.frctl.std .std-cuadro::-webkit-scrollbar{
+    width: 5px;
+    height: 5px;
+}
+.frctl.std .std-cuadro::-webkit-scrollbar-thumb:hover{
+    background-color: #56585b;
+    border-radius: 5px;    
+}
+.frctl.std .std-cuadro::-webkit-scrollbar-thumb{
+    background-color: #90969c;
+    border-radius: 5px;    
+}
+
+
+
+/* Solo Muestra la cabecera */
+.std-filtro .pvtTdForRender, 
+.std-filtro .pvtRendererArea , 
+.std-filtro .pvtVals, 
+.std-filtro .pvtCols , 
+.std-filtro .pvtRows {
+    display: none
+}
+/* * banda donde estan los botones de filtro  */ 
+.std-filtro .pvtUnused {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-content: center;
+    background-color: #3b4711;
+    padding: 15px 0px;
+    margin-bottom: 35px;
+}
+
+/* Cada elemento en el filtro */
+.std-filtro .pvtUnused li span.pvtAttr {
+    border-color: grey;
+    min-width: 180px;
+    display: inline-flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 0px;
+    font-size: 15px;
+    background-color: white;
+    cursor: pointer;
+}
+/* Filtro para el span con flecha */
+.std-filtro .pvtUnused li span.pvtAttr span.pvtTriangle{
+    font-size: 15px;
+    background-color: white;
+}
+
+
+
+/* caja de filtro*/
+/* OCUTA CAbeceras y tuitulos de filtros */
+.pvtFilterBox {
+    z-index: 99999;
+   /*  min-width: auto;*/
+    border: 1px solid gray;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    position: absolute;
+    text-align: center;
+    opacity: 1;
+}
+
+
+/* OCULTA CABECERAS AXIX Para ocultar las cabeceras y lado izquierda del resultado del pivot */
+.std-cuadro .pvtTdForRender, 
+.std-cuadro .pvtAxisContainer, 
+.std-cuadro .pvtVals {
+    display: none
+}
+
+
+/** MAQUETACION GRID */
+.std-tablero{
+    display: grid;
+    grid-template-rows: minmax(80px auto);
+    grid-auto-rows: minmax(200px auto);/* 600px;*/
+    gap: 20px 25px;
+    align-items: stretch;
+    margin: 0px 20px;
+}
+.std-filtro{
+    grid-column: 1fr;
+}
+.std-cuadro{
+    min-height: 200px;
+    max-height: 600px;
+    height: 100%;
+    max-width: 100%;
+    overflow: auto;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+/*Si es mas grande que laptop  laptop 
+se modifica para que muestre dos columnas */
+@media (min-width: 920px) {
+    .std-tablero{
+        grid-template-columns: 1fr 1fr;
+    }
+    .std-filtro{
+        grid-column: span 2;
+    }
+}
+
+
+
+/* Oculta hightchart credits*/
+.highcharts-credits{
+    display: none;
+}
+
+
+
+
+
+
+
+
+
