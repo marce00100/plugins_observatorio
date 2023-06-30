@@ -446,7 +446,7 @@ ob_start(); ?>
             let imagen =  (val.imagen_sm && val.imagen_sm.length > 0) ? `<img src='${val.imagen_sm}' alt="" style="width:100%; max-width: 260px" >` : '__';
             box += /*html*/
             `<div class="resumen ph5 ml30 wp90">
-              <div class="pv10 row fs15 flex flex-wrap ph20" style="">
+              <div class="pv10 row fs15 flex wrap ph20" style="">
 
                 <div class="col-xs-12 col-sm-12 hidden-md hidden-lg hidden-xl mb20">
                   <h3>${val.titulo}</h3>
@@ -456,7 +456,7 @@ ob_start(); ?>
 
                 <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 flex justify-center align-center">${imagen}</div>
 
-                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-space-between ml5 text-justify" style="height:100%">
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-between ml5 text-justify" style="height:100%">
                   <div clasS=" hidden-sm hidden-xs">
                     <h3>${val.titulo}</h3>
                     <span class="text-666 fs13">Fecha: ${moment(val.fecha).format('DD/MM/YYYY')}</span>                    

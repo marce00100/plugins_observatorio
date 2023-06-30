@@ -1,7 +1,7 @@
 <?php
 $contenidoPrefijRuta = "cont/v1/";
 
-Route::post($contenidoPrefijRuta, 'get-contents'   , 'Contenidos@getContentsPublic');
+Route::post($contenidoPrefijRuta, 'get-contents'   , 'Contenidos@getContents');
 Route::post($contenidoPrefijRuta, 'get-content'    , 'Contenidos@getContent');
 Route::post($contenidoPrefijRuta, 'save-content'   , 'Contenidos@saveContenido');
 Route::post($contenidoPrefijRuta, 'file-upload'    , 'Contenidos@fileUpload');

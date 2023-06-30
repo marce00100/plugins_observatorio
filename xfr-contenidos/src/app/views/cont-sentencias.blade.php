@@ -221,7 +221,6 @@ ob_start(); ?>
       dataList: [],
       indiceActual: -1,
 			tipo_contenido: "<?php echo $atts['tipo_contenido'] ?>",
-			sub_tipo: "<?php echo $atts['sub_tipo'] ?>",
     }
 
     let conT = {
@@ -230,7 +229,7 @@ ob_start(); ?>
 
       fillDataT: function () {
 				$('[__cabecera_dt]').html( `Sentencias con Perspectiva de Género Premiadas`);
-				$(`${ctxG.modal} [__cabecera_modal]`).html( `${ctxG.tipo_contenido.toUpperCase()} ${ctxG.sub_tipo.toUpperCase()}`);
+				$(`${ctxG.modal} [__cabecera_modal]`).html( `${ctxG.tipo_contenido.toUpperCase()} `);
         /* Aqui se configura el DT y se le asigna al Contenedor*/
         conT.dt = $(ctxG.dataTableTarget).DataTable({
           processing: true,
@@ -246,7 +245,6 @@ ob_start(); ?>
 						type: "POST",
 						data: function(data){
               data.tipo_contenido = ctxG.tipo_contenido;
-							data.sub_tipo = ctxG.sub_tipo;
 						},
             complete: (res) => {
               ctxG.dataList = conT.dt.rows().data();
@@ -272,7 +270,7 @@ ob_start(); ?>
                 let imagen =  (row.imagen_sm && row.imagen_sm.length > 0) ? `<img src='${row.imagen_sm}' alt="" style="width:100%; max-width: 260px" >` : '__';
                   // ((row.url_primera_imagen && row.url_primera_imagen.length > 0) ?  `<img src='${row.url_primera_imagen}' alt="" style="width:100%; max-width: 320px" >`: '__');
                 let html = /*html*/`  
-                      <div class="pv10 row fs15 flex flex-wrap ph20" style="" __cont_id_contenido="${row.id_contenido}" __index="${meta.row}">
+                      <div class="pv10 row fs15 flex wrap ph20" style="" __cont_id_contenido="${row.id_contenido}" __index="${meta.row}">
 
                         <div class="col-xs-11 mb20">
                           <h3>${row.titulo}</h3>
@@ -283,7 +281,7 @@ ob_start(); ?>
 
                         <!-- <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 flex justify-center align-center">${imagen}</div>
                             -->
-                        <div class="col-xs-11  flex flex-y justify-space-between ml20 text-justify" style="height:100%">
+                        <div class="col-xs-11  flex flex-y justify-between ml20 text-justify" style="height:100%">
                           
                           <div class="mt20">${row.resumen} ... </div>
                           <div class="text-center mt20">
@@ -530,7 +528,7 @@ ob_start(); ?>
             let imagen =  (val.imagen_sm && val.imagen_sm.length > 0) ? `<img src='${val.imagen_sm}' alt="" style="width:100%; max-width: 260px" >` : '__';
             box += /*html*/
             `<div class="resumen ph5 ml30 wp90">
-              <div class="pv10 row fs15 flex flex-wrap ph20" style="">
+              <div class="pv10 row fs15 flex wrap ph20" style="">
 
                 <div class="col-xs-12 col-sm-12 hidden-md hidden-lg hidden-xl mb20">
                   <h3>${val.titulo}</h3>
@@ -540,7 +538,7 @@ ob_start(); ?>
 
                 <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 flex justify-center align-center">${imagen}</div>
 
-                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-space-between ml5 text-justify" style="height:100%">
+                <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-between ml5 text-justify" style="height:100%">
                   <div clasS=" hidden-sm hidden-xs">
                     <h3>${val.titulo}</h3>
                     <span class="text-666 fs13">Fecha: ${moment(val.fecha).format('DD/MM/YYYY')}</span>                    

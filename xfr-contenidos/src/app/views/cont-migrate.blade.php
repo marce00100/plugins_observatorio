@@ -10,7 +10,7 @@ function get_view_contenidos_migrate($xfrContenidos) {
 ob_start(); ?>
 
     <div id="wrap_migrate" class="bg-content frctl">
-      <div clasS="mt20 mb20 bg-eee br-a br-greyer br6 p20 flex justify-center flex-wrap font-roboto ">
+      <div clasS="mt20 mb20 bg-eee br-a br-greyer br6 p20 flex justify-center wrap font-roboto ">
         <div class="form-group wp40 mr10">
           <label for="sistema" class="form-label">Sistema:</label>
           <select id="sistema" name="sistema" __migrate_field="sistema" class="form-control">
@@ -22,10 +22,16 @@ ob_start(); ?>
           <label for="tipo_contenido" class="form-label">Tipo Contenido</label>
           <input id="tipo_contenido" name="tipo_contenido" type="text" __migrate_field="tipo_contenido"
             class="form-control">
+          <div class="fs11">
+            <em>OBSERVATORIO: contenidos: noticias, actividades; biblioteca_juridica: normas, jurisprudencias, recomendaciones, jurisprudencia_relevante </em>
+          </div>
+          <div class="fs11">
+            <em>MAGISTRATURA: contenidos: noticias, comunicados </em>
+          </div>
         </div>
         <hr class="wp100">
-        <div class="flex justify-space-around wp100">
-          <button __migrate class="btn btn-md bg-success--40 br-a br-success text-eee">MIGRAR MÓDULO -
+        <div class="flex justify-around wp100">
+          <button __migrate class="btn btn-md bg-primary--40 br-a br-info text-eee">MIGRAR MÓDULO -
             TipoContenido</button>
           <button __migrate_full class="btn btn-md bg-danger--40 br-a br-greyer text-eee">MIGRAR TODO</button>
         </div>
@@ -48,8 +54,8 @@ ob_start(); ?>
         let objSend = xyzFuns.getData__fields('__migrate_field');
         $.post(`${ctxG.rutabase}/migrate-tables-to-xfr-contenidos-format`, objSend,
           (resp) => {
-            $("[__migrate_msg]").removeClass('hide bg-light br-a br-danger br-success')
-            .addClass(resp.status == 'ok' ? 'bg-light br-a br-success': 'bg-light br-a br-danger').html(resp.msg);
+            $("[__migrate_msg]").removeClass('hide bg-success--20 bg-danger--20  br-a br-dark')
+            .addClass(resp.status == 'ok' ? 'bg-success--20  br-a br-dark': 'bg-danger--20  br-a br-dark').html(resp.msg);
             funs.spinner(0);
           })
 

@@ -18486,6 +18486,9 @@ ol.timeline-list li.timeline-item .timeline-date {
 .br-tp-left {
   border-left-color: rgba(0, 0, 0, 0.1);
 }
+.br-box{
+  box-sizing: border-box;
+}
 
 
 /*===============================================
@@ -18700,6 +18703,12 @@ on tables, feel free to add more*/
 .wp40 {
   width: 40% !important;
 }
+.wp47 {
+  width: 47% !important;
+}
+.wp48 {
+  width: 48% !important;
+}
 .wp50 {
   width: 50% !important;
 }
@@ -18720,6 +18729,15 @@ on tables, feel free to add more*/
 }
 .wp90 {
   width: 90% !important;
+}
+.wp95 {
+  width: 95% !important;
+}
+.wp97 {
+  width: 97% !important;
+}
+.wp98 {
+  width: 98% !important;
 }
 .wp100 {
   width: 100% !important;
@@ -25410,7 +25428,7 @@ Copyright (c) 2014 Daniel Eden
 .align-stretch{
   align-items: stretch;
 }
-.flex-wrap{
+.flex.wrap{
   flex-wrap: wrap;
 }
 .gap-3{

@@ -5,16 +5,15 @@
 add_shortcode('fr_contenidos', function ($atts, $content) {
 	$default_atts = [
 		'tipo_contenido' 	=> 'noticias',
-		'sub_tipo' 				=> ''
 	];
   // Fusionar los atributos predeterminados con los atributos proporcionados por el usuario
   $atts = shortcode_atts($default_atts, $atts);
 	global $xfrContenidos;
 	//TODO modificar 
-	if($atts['tipo_contenido'] != 'sentencias')
-	$html = get_view_contenidos($xfrContenidos, $atts);
+	if ($atts['tipo_contenido'] != 'sentencias')
+		$html = get_view_contenidos($xfrContenidos, $atts);
 	else
-	$html = get_view_sentencias($xfrContenidos, $atts);
+		$html = get_view_sentencias($xfrContenidos, $atts);
 	return $html;
 });
 

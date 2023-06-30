@@ -13105,6 +13105,9 @@ fieldset[disabled] .btn {
 .frctl .br-tp-left {
   border-left-color: rgba(0, 0, 0, 0.1);
 }
+.frctl .br-box{
+  box-sizing: border-box;
+}
 
 
 /*===============================================
@@ -13310,6 +13313,12 @@ on tables, feel free to add more*/
 .frctl .wp40 {
   width: 40% !important;
 }
+.frctl .wp47 {
+  width: 47% !important;
+}
+.frctl .wp48 {
+  width: 48% !important;
+}
 .frctl .wp50 {
   width: 50% !important;
 }
@@ -13330,6 +13339,15 @@ on tables, feel free to add more*/
 }
 .frctl .wp90 {
   width: 90% !important;
+}
+.frctl .wp95 {
+  width: 95% !important;
+}
+.frctl .wp97 {
+  width: 97% !important;
+}
+.frctl .wp98 {
+  width: 98% !important;
 }
 .frctl .wp100 {
   width: 100% !important;
@@ -14989,13 +15007,13 @@ on tables, feel free to add more*/
 .frctl .justify-end{
   justify-content: end;
 }
-.frctl .justify-space-around{
+.frctl .justify-around{
   justify-content: space-around;  
 }
-.frctl .justify-space-between{
+.frctl .justify-between{
   justify-content: space-between;
 }
-.frctl .justify-space-evenly {
+.frctl .justify-evenly {
   justify-content: space-evenly;
 }
 .frctl .align-center{
@@ -15010,7 +15028,7 @@ on tables, feel free to add more*/
 .frctl .align-stretch{
   align-items: stretch;
 }
-.frctl .flex-wrap{
+.frctl .flex.wrap{
   flex-wrap: wrap;
 }
 .frctl .gap-3{

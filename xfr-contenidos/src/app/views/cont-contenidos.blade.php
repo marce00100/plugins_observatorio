@@ -138,7 +138,7 @@ ob_start(); ?>
       dataList: [],
       indiceActual: -1,
 			tipo_contenido: "<?php echo $atts['tipo_contenido'] ?>",
-			sub_tipo: "<?php echo $atts['sub_tipo'] ?>",
+
     }
 
     let conT = {
@@ -146,14 +146,11 @@ ob_start(); ?>
       selectedRow: {},
 
       fillDataT: function () {
-				$('[__cabecera_dt]').html( `${ctxG.tipo_contenido.toUpperCase()} ${ctxG.sub_tipo.toUpperCase()}`);
-				$(`${ctxG.modal} [__cabecera_modal]`).html( `${ctxG.tipo_contenido.toUpperCase()} ${ctxG.sub_tipo.toUpperCase()}`);
         /* Aqui se configura el DT y se le asigna al Contenedor*/
         conT.dt = $(ctxG.dataTableTarget).DataTable({
           processing: true,
 					serverSide: true,
           autoWidth: true,
-          // data: ctxG.usersList,
           // info:true,
           scrollX: true,
           className: 'fs-10',
@@ -161,12 +158,15 @@ ob_start(); ?>
 					ajax: {
 						url: `${ctxG.rutabase}/get-contents`,
 						type: "POST",
-						data: function(data){
+            data: function (data) {
               data.tipo_contenido = ctxG.tipo_contenido;
-							data.sub_tipo = ctxG.sub_tipo;
 						},
             complete: (res) => {
               ctxG.dataList = conT.dt.rows().data();
+              /* para obtener la data , en la seccion complete se encuentra en la propiedad de responseJSON*/
+              let respuesta = res.responseJSON;              
+              $('[__cabecera_dt]').html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()} `);
+              $(`${ctxG.modal} [__cabecera_modal]`).html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()}`);
             }
 					},
           searchDelay: 800, // Retardo de búsqueda en milisegundos
@@ -189,7 +189,7 @@ ob_start(); ?>
                 let imagen =  (row.imagen_sm && row.imagen_sm.length > 0) ? `<img src='${row.imagen_sm}' alt="" style="width:100%; max-width: 260px" >` : '__';
                   // ((row.url_primera_imagen && row.url_primera_imagen.length > 0) ?  `<img src='${row.url_primera_imagen}' alt="" style="width:100%; max-width: 320px" >`: '__');
                 let html = /*html*/`  
-                      <div class="pv10 row fs15 flex flex-wrap ph20" style="" __cont_id_contenido="${row.id_contenido}" __index="${meta.row}">
+                      <div class="pv10 row fs15 flex wrap ph20" style="" __cont_id_contenido="${row.id_contenido}" __index="${meta.row}">
 
                         <div class="col-xs-12 col-sm-12 hidden-md hidden-lg hidden-xl mb20">
                           <h3>${row.titulo}</h3>
@@ -199,7 +199,7 @@ ob_start(); ?>
 
                         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 flex justify-center align-center">${imagen}</div>
 
-                        <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-space-between ml20 text-justify" style="height:100%">
+                        <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-between ml20 text-justify" style="height:100%">
                           <div clasS=" hidden-sm hidden-xs">
                             <h3>${row.titulo}</h3>
                             <span class="text-666 fs13">Publicado en: ${moment(row.fecha_publicacion).format('DD/MM/YYYY')}</span>
@@ -218,7 +218,6 @@ ob_start(); ?>
           ],
           language: xyzFuns.dataTablesEspanol(),
         });
-				$('#modal').removeClass('hide')
       },
       refreshDataT: () => {
         conT.dt.clear().destroy();
@@ -231,11 +230,10 @@ ob_start(); ?>
     }
 
     let funs = {
-      /* Obtener Cnetnidos del id De labase de datos POST*/
+      /* Obtener Cnetnidos del id De labase de datos*/
       obtenerContenido(id_contenido, callback){
         funs.spinner();
         $.post(`${ctxG.rutabase}/get-content`, { id_contenido: id_contenido }, (resp) => {
-          // $("[__titulo]").html(`${content.tipo_contenido.toUpperCase()} ${content.sub_tipo.toUpperCase()}`);
           callback(resp);
           xyzFuns.showModal(ctxG.modal);
           setTimeout(() => {
@@ -249,8 +247,8 @@ ob_start(); ?>
         funs.spinner();
         /* Coloca en una variableglobalel indice deldataTable*/
         ctxG.indiceActual = parseInt($(`[__cont_id_contenido=${id_contenido}]`).attr("__index"));
-        funs.obtenerContenido(id_contenido, (resp)=>{
-          $("[__contenido]").html(funs.creaHtmlContenido(resp.data));
+        funs.obtenerContenido(id_contenido, (resp) => {
+          $("[__contenido]").html(funs.creaHtmlContenido(resp.data, resp.config));
         });
       },
       /* Siguiente Atras */
@@ -268,7 +266,7 @@ ob_start(); ?>
         function newCard(nav, indiceNew){
           let contentNew = ctxG.dataList[indiceNew];
           funs.obtenerContenido(contentNew.id_contenido, (resp) => {
-            let newContentHtml = funs.creaHtmlContenido(resp.data);
+            let newContentHtml = funs.creaHtmlContenido(resp.data, resp.config);
             cardNew = $(newContentHtml).css('display', 'none');
             cardOld = $("[__contenido] [__card]");
             transicionCards(nav, cardOld, cardNew);
@@ -330,24 +328,38 @@ ob_start(); ?>
         
       },
       /* Crea htmlContenido*/
-      creaHtmlContenido: (obj)=>{
+      creaHtmlContenido: (obj, objConfig)=>{
         let imagen = !obj.imagen ? '' :
                           /*html*/`
                           <div class="mt30">
 														<img src='${obj.imagen}' alt=""   >
 													</div>`;
-          let resumen = !obj.resumen ? '' :
+        let resumen = !obj.resumen ? '' :
                           /*html*/`
                           <div class="mt30 br-a br-light br8 p20">                            
 														${obj.resumen}
 													</div>`;
-          let extraFields = !obj.extra_fields ? '' :
-                          /*html*/`
-                          <div>
-                            <i class="fa fa-rss mr15"></i> FUENTE: <a href="${obj.extra_fields.pagina}">${obj.extra_fields.fuente}</a>
-                          </div>`;
-                    
-          let htmlContenido = /*html*/`
+        let campos_extra = '';
+        if (obj.campos_extra && objConfig.campos_extra) {
+          _.forEach(objConfig.campos_extra, (itemConfig) => {
+            campos_extra += !obj.campos_extra[itemConfig.nombre] ? '' :
+              /*html*/`
+              <div>
+                <i class="${itemConfig.icono_class} mr15"></i> 
+                ${itemConfig.etiqueta}: ${itemConfig.tipo == 'link' ?  
+                /*html*/`<a href="${obj.campos_extra[itemConfig.nombre]}" target="_blank">${obj.campos_extra[itemConfig.nombre]}</a>` :
+                /*html*/`<span>${obj.campos_extra[itemConfig.nombre]}</span>` 
+              }
+              </div>`
+          })
+        }
+
+        let archivos = (!obj.archivos || obj.archivos.length <= 0 ) ? '' : 
+            '<div class="mt10"><div>Anexos</div>' + _.reduce(obj.archivos.split(','), function (carry, elem, k) {
+                return carry + /*html*/`  <a href="../wp-content/anexos/archivos/${objConfig.directorio}/${elem}" target="_blank"><i class="glyphicon glyphicon-cloud-download"></i> Descarga_${k + 1}</a>`
+              }, '') + '</div>';
+
+        let htmlContenido = /*html*/`
 												<div class="fs15" __card __id_contenido="${obj.id_contenido}">
 													<h2 class="ph20">${obj.titulo}</h2>
 													<div clasS=" ph20 flex justify-end">
@@ -359,7 +371,8 @@ ob_start(); ?>
 													<div class="mt10 p10 pl20 pr40">                            
 														${obj.contenido}
 													</div class="mt10 p10 pl20 pr40">
-                          ${extraFields}
+                          ${campos_extra}
+                          ${archivos}
 												</div>`;
         return htmlContenido;
       },

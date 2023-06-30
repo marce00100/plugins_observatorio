@@ -8,6 +8,7 @@ class ContenidosMigrateController extends MasterController {
    * POST para migrar las tablas del Observatorio 
    */
   public  function migrarTablas(WP_REST_Request $req) {
+    $tiempoInicio = microtime(true);
     set_time_limit(60 * 60 * 6);
     /* Quitar si no es WP */
 		$req            = (object)$req->get_params();
@@ -19,32 +20,32 @@ class ContenidosMigrateController extends MasterController {
       return (object)['status' => 'error', 'msg' => 'Error, falta parametros'];
     }
 
-    if ($sistema == 'observatorio' && $tipo_contenido == 'biblioteca_juridica') {
-      $modulos = ['normas', 'jurisprudencia', 'recomendaciones'];
-      $error = false;
+    /** Modulos de  Biblioteca Juridica  o Contenidos */
+    if ($sistema == 'observatorio' && ($tipo_contenido == 'biblioteca_juridica' || $tipo_contenido == 'contenidos')) {
+      $modulos = $tipo_contenido == 'biblioteca_juridica' ? 
+        ['normas', 'jurisprudencia', 'recomendaciones', 'jurisprudencia_relevante'] :
+        ['noticias', 'actividades'];
+      $errores = 0;
       foreach ($modulos as $key => $value) {
         $resp = $this->migra($sistema, $value);
-        $error = $error && ($resp->status == 'error');
+        $errores = $errores + ($resp->status == 'error') ? 1 : 0;
       }
 
       return [
-        'status' => $error ? 'error' : 'ok',
-        'msg' => $error ? 'Ocurrio un error': 'Se realizo la migracion'
+        'status' => $errores > 0 ? 'error' : 'ok',
+        'msg'    => $errores > 0 ? 'Ocurrio un error': 'Se realizo la migracion',
+        'time'   => microtime(true) - $tiempoInicio
       ];
-
-    }
-    else{
-
+    } 
+    else {
       $resp = $this->migra($sistema, $tipo_contenido);
     }
 
     return [
       'status'  => $resp->status,
       'msg'     => $resp->msg,
+      'time'    => microtime(true) - $tiempoInicio
     ];
-    
-
-    
   }
 
   private function migra($sistema, $tipo_contenido){
@@ -115,8 +116,11 @@ class ContenidosMigrateController extends MasterController {
 
       foreach ($list as $item) {
         $cont                    = (object)[];
-        $cont->tipo_contenido    = $tipo_contenido;
-        $cont->sub_tipo          = $item->categoria . 'es';
+        $tipo_contenido_modif =  ($tipo_contenido == 'noticias') ? 
+                                strtolower($tipo_contenido) . "_" . strtolower($item->categoria . 'es'):
+                                strtolower($tipo_contenido);
+        $cont->tipo_contenido    = $tipo_contenido_modif;
+        // $cont->sub_tipo          = ucfirst(strtolower($item->categoria . 'es'));
         $cont->fecha_publicacion = $item->fecha;
         $cont->titulo            = $item->titulo;
         $cont->resumen           = $item->resumen;
@@ -128,10 +132,11 @@ class ContenidosMigrateController extends MasterController {
 
         $cont->texto             = html_entity_decode(self::quitarHtmlTags($cont->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $cont->imagen            = $item->imagen;
+        $cont->orden             = 1;
         $cont->estado_contenido  = 1;
 
         /** Al codificar a formato json con la opcon JSON_ENESCAPED_UNICODE se escapan los caracteres especiales y no son transformados al tipo \u00e1 que es á */
-        $cont->extra_fields      = ($tipo_contenido == 'noticias') ? 
+        $cont->campos_extra      = ($tipo_contenido == 'noticias') ? 
                                     json_encode(([
                                       'pagina' => $item->pagina,
                                       'fuente' => $item->fuente
@@ -154,7 +159,7 @@ class ContenidosMigrateController extends MasterController {
       $completeList = $DB->select("SELECT * FROM xfr_contenidos ");
       foreach ($completeList as $val) {
         $val = (object)$val;
-        $val->otrosfields = json_decode($val->extra_fields);
+        $val->otrosfields = json_decode($val->campos_extra);
       }
       return (object)[
         'status' => 'ok',
@@ -244,6 +249,12 @@ class ContenidosMigrateController extends MasterController {
       ];
       
     }
+
+    return (object)[
+      'status' => 'error',
+      'msg' => 'Ocurrio un error o No existe el modulo ' . $tipo_contenido,
+
+    ];
   }
 
 

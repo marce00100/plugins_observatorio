@@ -98,7 +98,7 @@ ob_start();
 						</div>
 					</div>
 					<!-- panelfooter -->
-					<div class="panel-footer flex flex-wrap justify-evenly">
+					<div class="panel-footer flex wrap justify-evenly">
 						<div __error class="wp100"></div>
 						<!-- CON ICONOS -->
 						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 fs14">Cancelar</button>

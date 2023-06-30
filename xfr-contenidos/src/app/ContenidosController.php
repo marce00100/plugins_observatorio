@@ -2,15 +2,13 @@
 use frctl\MasterController;
 
 class ContenidosController extends MasterController {
-	// private $tabla = (object)[
-	// 	'comunicados' => 'xfr_contenidos_magistratura',
-	// 	'noticias'		=> 'xfr_contenidos_magistratura',
-	// ];
+
 	/**
 	 * POST Obtiene los contenidos, $request tiene la informacion del datatable
 	 * Exclusivo PARA DATATABLES desde servidor con  Ajax 
 	 */
-	public function getContentsPublic(WP_REST_Request $req) {
+	public function getContents(WP_REST_Request $req) {
+		$tiempoInicio = microtime(true);
 		/* Quitar si no es WP */
 		$req = (object)$req->get_params();
 
@@ -18,16 +16,16 @@ class ContenidosController extends MasterController {
 		$obj = (object)[];
 		/* Parametros de DataTable */
 		$obj->draw            = $req->draw ?? 1;
-		$obj->start           = $req->start ?? 1;
+		$obj->start           = $req->start ?? 0;
 		$obj->length          = $req->length ?? 10;
-		$obj->columnIndex     = $req->order ?  $req->order[0]['column'] : null; // Column index
+		$obj->columnIndex     = $req->order ?  $req->order[0]['column'] : 0; // Column index
 		$obj->columnName      = $req->columns ? $req->columns[$obj->columnIndex]['data'] :  null; // Column name
 		$obj->columnSortOrder = $req->order ? $req->order[0]['dir'] : null; // asc or desc
 		$obj->searchValue     = $req->search ? html_entity_decode($req->search['value'], ENT_QUOTES | ENT_HTML5, 'UTF-8') :  null;
 		$this->debugNormal();
-		$obj->estado_contenido = 1; /* Solo Activos */
+		/* si no es admin (estado = 'todos') selecciona Solo Activos */
+		(isset($req->estado_contenido) && $req->estado_contenido == 'todos') ? true : $obj->estado_contenido = 1; 
 		$obj->tipo_contenido   = $req->tipo_contenido ?? '';
-		$obj->sub_tipo         = $req->sub_tipo ?? '';
 		
 		$obj->textoBusqueda = $req->texto_busqueda ?? null;
 
@@ -38,17 +36,16 @@ class ContenidosController extends MasterController {
 		}	
 
 		return [
-			'data'            => $contenidos->data,
-			'draw'            => $contenidos->draw,
-			'recordsTotal'    => $contenidos->recordsTotal,
-			'recordsFiltered' => $contenidos->recordsFiltered,
-			'query'						=> $contenidos->query,
+			'data'                 => $contenidos->data,
+			'data_tipo_contenido'  => $contenidos->data_tipo_contenido,
+			'draw'                 => $contenidos->draw,
+			'recordsTotal'         => $contenidos->recordsTotal,
+			'recordsFiltered'      => $contenidos->recordsFiltered,
+			'query'							   => $contenidos->query,
+			'time'					       => microtime(true) - $tiempoInicio,
+			'obj' => $obj
 		];
 		
-	}
-
-	public function getContentsAdmin(WP_REST_Request $req) {
-
 	}
 
 	/**
@@ -60,21 +57,28 @@ class ContenidosController extends MasterController {
 		$condicion = '';
 		$condicion .= empty($obj->estado_contenido) ? '' : " AND estado_contenido = {$obj->estado_contenido} ";
 		$condicion .= empty($obj->tipo_contenido)   ? '' : " AND tipo_contenido like '{$obj->tipo_contenido}%' ";
-		$condicion .= empty($obj->sub_tipo)         ? '' : " AND sub_tipo like '{$obj->sub_tipo}%' ";
 		if($obj->searchValue )
 			$condicionSearch =  $obj->searchValue ? " AND (titulo like '%{$obj->searchValue}%' OR resumen like '%{$obj->searchValue}%' OR texto like '%{$obj->searchValue}%' )" : "";
 		else
-		$condicionSearch = $obj->textoBusqueda ?  " AND (titulo like '%{$obj->textoBusqueda}%' OR resumen like '%{$obj->textoBusqueda}%' OR texto like '%{$obj->textoBusqueda}%' )" : "";
+			$condicionSearch = $obj->textoBusqueda ?  " AND (titulo like '%{$obj->textoBusqueda}%' OR resumen like '%{$obj->textoBusqueda}%' OR texto like '%{$obj->textoBusqueda}%' )" : "";
+
+		/* SI la columna para ordenar  es 0 lo ordena por defecto : orden desc, fecha_publicacion desc 
+		(al ingresar siempre columnIndex es 0, eso en caso de que sea la vista publica, en admin la columna 0 es invisible)*/
+		$orderBy = '';
+		if($obj->columnIndex == 0)
+			$orderBy = " orden desc, fecha_publicacion desc";
+		else
+			$orderBy = " {$obj->columnName} {$obj->columnSortOrder}";
 
 		$DB = $this;
-		$query = "SELECT id as id_contenido, tipo_contenido, sub_tipo, titulo, resumen, contenido, estado_contenido, imagen
-						, fecha_publicacion, numero_vistas
+		$query = "SELECT id as id_contenido, tipo_contenido, titulo, resumen, contenido, estado_contenido, imagen
+						, fecha_publicacion, numero_vistas, orden
 						, SUBSTR(contenido, LOCATE('<img src=\"', contenido) + 10, LOCATE('\"', contenido, LOCATE('<img src=\"', contenido) + 10) - (LOCATE('<img src=\"', contenido) + 10)) AS url_primera_imagen
 						-- , SUBSTRING(contenido, LOCATE('<img', contenido), LOCATE('>', contenido, LOCATE('<img', contenido)) - LOCATE('<img', contenido) + 1) AS primera_imagen
 						, CASE WHEN (imagen IS NOT NULL AND imagen != '') THEN  CONCAT(SUBSTRING_INDEX(imagen, '.', 1), '_s.', SUBSTRING_INDEX(imagen, '.', -1)) 
 						ELSE '' END AS imagen_sm
 						FROM xfr_contenidos  WHERE TRUE {$condicion} {$condicionSearch}
-						ORDER BY fecha_publicacion desc 
+						ORDER BY {$orderBy}
 						LIMIT {$obj->start}, {$obj->length} 
 						";
 		$lista_contenidos = collect($DB->select($query));	
@@ -114,15 +118,16 @@ class ContenidosController extends MasterController {
 		}
 
 		$recordsTotal = collect($DB->select("SELECT count(*) as total  FROM xfr_contenidos  WHERE TRUE {$condicion}  "))->first()->total;
-
 		$recordsFiltered =  collect($DB->select("SELECT count(*) as total  FROM xfr_contenidos  WHERE TRUE {$condicion}  {$condicionSearch} "))->first()->total;
 
 		return (object)[
-			'data'            => $lista_contenidos->toArray(),
-			'draw'            => $obj->draw,
-			'recordsTotal'    => $recordsTotal,
-			'recordsFiltered' => $recordsFiltered,
-			'query' 					=> $query,
+			'data'                 => $lista_contenidos->toArray(),
+			'data_tipo_contenido'  => $configsTipoCont,
+			'draw'                 => $obj->draw,
+			'recordsTotal'         => $recordsTotal,
+			'recordsFiltered'      => $recordsFiltered,
+			'query' 					     => $query,
+
 		];
 
 	}
@@ -138,11 +143,11 @@ class ContenidosController extends MasterController {
 
 		$DB = $this;
 		// replace(introtext, 'img src="images/', 'img src="../images/')
-		$contenido = collect($DB->select("SELECT c.id as id_contenido, c.tipo_contenido, c.sub_tipo, 
+		$contenido = collect($DB->select("SELECT c.id as id_contenido, c.tipo_contenido, 
 										c.fecha_publicacion, c.titulo, c.resumen
 										, c.contenido
 										, c.imagen
-										, c.estado_contenido, c.numero_vistas, c.extra_fields
+										, c.estado_contenido, c.numero_vistas, c.orden, c.campos_extra, c.archivos
 										FROM xfr_contenidos c 
 										WHERE c.id = {$req->id_contenido}"))->first();
 
@@ -177,11 +182,12 @@ class ContenidosController extends MasterController {
 		//TODO realizar transformacion de imagen o palabraclave por la url e imagen correcta
 		$contenido->contenido = str_replace('<img src="', '<img src="' . $configsTipoCont->urlImagenesModulo, $contenido->contenido);	
 
-		$contenido->extra_fields = json_decode($contenido->extra_fields); 
+		$contenido->campos_extra = json_decode($contenido->campos_extra); 
 		// $contenido->sistema = $site;
 
 		return (object)[
 			'data'    => $contenido,
+			'config'	=> $configsTipoCont->config,
 			'status' => 'ok'
 		];
 	}
@@ -196,7 +202,7 @@ class ContenidosController extends MasterController {
 		$site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
 		if($site != 'observatorio')
 			return ['status' => 'error', 'msg' => 'No es el sitio del observatorio'];
-			$condicionSearch = '';
+		$condicionSearch = '';
 		if($obj->searchValue )
 			$condicionSearch =  $obj->searchValue ? 
 			" AND (titulo like '%{$obj->searchValue}%' 
@@ -280,6 +286,7 @@ class ContenidosController extends MasterController {
 				return (object)[
 					// 'data'             => $lista_contenidos,
 					'data'            => $lista_contenidos->toArray(),
+					// 'data_tipo_contenido'  => $configsTipoCont,
 					'draw'            => $obj->draw,
 					'recordsTotal'    => $recordsTotal,
 					'recordsFiltered' => $recordsFiltered,
@@ -310,20 +317,19 @@ class ContenidosController extends MasterController {
 		$obj                       = (object)[];
 		$obj->id                   = $req->id_contenido ?? null;
 		$obj->tipo_contenido       = $req->tipo_contenido;
-		$obj->sub_tipo             = $req->sub_tipo;
 		$obj->fecha_publicacion    = $req->fecha_publicacion;
 		$obj->titulo               = $req->titulo;
 		$obj->resumen              = $req->resumen??'';
 		$obj->contenido            = $req->contenido;
-		$obj->imagen               = $req->imagen ?? null;
+		$req->imagen ? $obj->imagen = $req->imagen : false;
 		$obj->estado_contenido     = $req->estado_contenido;
 		$obj->texto                = $req->texto ??'';
 		$obj->texto_corto          = $req->texto_corto ?? '';
 		$obj->texto_token          = $req->texto_token ?? '';
 		$obj->orden                = $req->orden ?? 1;
-		$obj->extra_fields         = $req->extra_fields ?? '';
+		$obj->campos_extra         = $req->campos_extra ? json_encode($req->campos_extra) : '';
 		$obj->imagenes             = $req->imagenes ?? '';
-		$obj->archivos             = $req->archivos ?? '';
+		$obj->archivos             = (isset($req->archivos) && count($req->archivos)>0 )? implode(',', $req->archivos) : '';
 		
 		$user_id = get_current_user_id();
 		// //TODO: no esta guardando el valor de user_id  solo coloca cero- no jala de WP
@@ -332,10 +338,10 @@ class ContenidosController extends MasterController {
 		!($req->id_contenido) ? $obj->created_at  = $this->now()    : false;
 		!($req->id_contenido) ? $obj->created_by  = $user_id        : false;
 		/** Solo para caso update */
-		($req->id_contenido) ? $obj->updated_at = $req->updated_at  : false;
+		($req->id_contenido) ? $obj->updated_at = $this->now() : false;
 		($req->id_contenido) ? $obj->updated_by = $user_id          : false;
 
-		// $obj->id_contenido = $this->guardarObjetoTabla($obj, 'xfr_contenidos');
+		$obj->id_contenido = $this->guardarObjetoTabla($obj, 'xfr_contenidos');
 
 		return [
 			'data'   => $obj,
@@ -350,33 +356,79 @@ class ContenidosController extends MasterController {
 	 * se reciben a travez de metodos $_FILES y $_POST ya que vieneen uobjeto formData
 	 */
 	public function fileUpload() {
-		$nombreImagen    = $_FILES['file']['name'];
-		$archivoTemporal = $_FILES['file']['tmp_name'];
-		$size            = $_FILES['file']['size'];
-
-		$objPost         = (object)$_POST;
-
+		// return;
+		$obj  = (object)$_POST;
 		/* Se obtiene las configuraciones de rutas del parametro del tipo contenido */
-		$configsTipoCont = $this->objTipoContenido($objPost->tipo_contenido);
+		$obj->paramTipoCont = $this->objTipoContenido($obj->tipo_contenido);
+		$obj->site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
+		$respuesta = [];
+		if (!empty($_FILES['imagen'])) {
+			$imagenFile               = $_FILES['imagen'];
+			$obj->nombre              = $imagenFile['name'];
+			$obj->archivoTemporal     = $imagenFile['tmp_name'];
+			// $obj->size             = $imagenFile['size'];
+			$obj->tipo                = 'imagen';
+			$respuesta[] = $this->moveFile($obj);
 
-		$site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
+		}
+		if (!empty($_FILES['imagen_s'])) {
+			$imagenFile               = $_FILES['imagen_s'];
+			$extension = pathinfo($imagenFile['name'], PATHINFO_EXTENSION); // Obtener la extensión del archivo
+			$nuevoNombre = pathinfo($imagenFile['name'], PATHINFO_FILENAME) . '_s.' . $extension; // Agregar el sufijo al nombre del archivo
+			$obj->nombre              = $nuevoNombre;
+			$obj->archivoTemporal     = $imagenFile['tmp_name'];
+			// $obj->size             = $imagenFile['size'];
+			$obj->tipo                = 'imagen';
+			$respuesta[] = $this->moveFile($obj);
+		}
+		if (!empty($_FILES['archivos'])) {
+			$file                     = $_FILES['archivos'];
+			for ($i = 0; $i < count($file['name']); $i++) {
+				$obj->nombre              = $file['name'][$i];
+				$obj->archivoTemporal     = $file['tmp_name'][$i];
+				// $obj->size             = $imagenFile['size'];
+				$obj->tipo                = 'archivo';
+				$respuesta[] = $this->moveFile($obj);
+			}
+		}
 
+		$errores = 0;
+		$msgErrors = '';
+		foreach ($respuesta as $item) {
+			if($item->status == 'error'){
+				$errores ++;
+				$msgErrors .= $item->msg;
+			}
+		}
+
+		return [
+			'status' => $errores > 0 ? 'error' : 'ok',
+			'msg'		 => $errores > 0 ? $msgErrors : 'Se subieron todos los archivos'
+		];
+	}
+
+	private function moveFile($obj) {
 		// Verificar si se ha subido correctamente el archivo
-		if (is_uploaded_file($archivoTemporal)) {
-			$directorioDestino = ($objPost->tipo == 'imagen') ?
-				$configsTipoCont->pathImagenesModulo : $configsTipoCont->pathArchivosModulo; 
+		$respuesta = (object)[];
+		if (is_uploaded_file($obj->archivoTemporal)) {
+			$directorioDestino = ($obj->tipo == 'imagen') ?
+				$obj->paramTipoCont->pathImagenesModulo : $obj->paramTipoCont->pathArchivosModulo; 
 
 			// Mover el archivo del directorio temporal al directorio de destino
-			if (move_uploaded_file($archivoTemporal, $directorioDestino . $nombreImagen)) {
-				echo "La imagen se ha almacenado correctamente.";
+			if (move_uploaded_file($obj->archivoTemporal, $directorioDestino . $obj->nombre)) {
+				$respuesta->status = "ok";
+				$respuesta->msg = "{$obj->tipo} {$obj->nombre}, almacenado correctamente.";
 			} 
 			else {
-				echo "Error al almacenar la imagen.";
+				$respuesta->status = "error";
+				$respuesta->msg =  "{$obj->tipo} {$obj->nombre}, Error al almacenar el archivo.";
 			}
 		} 
 		else {
-			echo "Error al subir la imagen.";
+			$respuesta->status = "error";
+			$respuesta->msg = "{$obj->tipo} {$obj->nombre}, Error al subir el archivo.";
 		}
+		return $respuesta;
 	}
 
 	/**
@@ -397,20 +449,13 @@ class ContenidosController extends MasterController {
 		global $xfrContenidos;
 
 		return (object)[
-			'config'							=> $configTipoCont,
-			'pathImagenesModulo'  => $xfrContenidos->pathImagenes  . $carpetaTipoCont,
-			'pathArchivosModulo'  => $xfrContenidos->pathArchivos  . $carpetaTipoCont,
-			'urlImagenesModulo'   => $xfrContenidos->urlImagenes  . $carpetaTipoCont,
-			'urlArchivosModulo'  	=> $xfrContenidos->urlArchivos  . $carpetaTipoCont,
+			'config'							     => $configTipoCont,
+			'param_tipo_contenido'		 => $paramTipoCont,
+			'pathImagenesModulo'       => $xfrContenidos->pathImagenes . $carpetaTipoCont,
+			'pathArchivosModulo'       => $xfrContenidos->pathArchivos . $carpetaTipoCont,
+			'urlImagenesModulo'        => $xfrContenidos->urlImagenes  . $carpetaTipoCont,
+			'urlArchivosModulo'  	     => $xfrContenidos->urlArchivos  . $carpetaTipoCont,
 		];
 	}
-
-
-
-
-
-
-
-
 
 }

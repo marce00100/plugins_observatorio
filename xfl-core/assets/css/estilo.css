@@ -990,75 +990,97 @@
 
 /********************/
 .bg-000 {
-	background-color: #000;
+	background-color: #000 !important;
 }
 
 .bg-111 {
-	background-color: #111;
+	background-color: #111 !important;
 }
 
 .bg-222 {
-	background-color: #222;
+	background-color: #222 !important;
 }
 
 .bg-333 {
-	background-color: #333;
+	background-color: #333 !important;
 }
 
 .bg-444 {
-	background-color: #444;
+	background-color: #444 !important;
 }
 
 .bg-555 {
-	background-color: #555;
+	background-color: #555 !important;
 }
 
 .bg-666 {
-	background-color: #666;
+	background-color: #666 !important;
 }
 
 .bg-777 {
-	background-color: #777;
+	background-color: #777 !important;
 }
 
 .bg-888 {
-	background-color: #888;
+	background-color: #888 !important;
 }
 
 .bg-999 {
-	background-color: #999;
+	background-color: #999 !important;
 }
 
 .bg-aaa {
-	background-color: #aaa;
+	background-color: #aaa !important;
 }
 
 .bg-bbb {
-	background-color: #bbb;
+	background-color: #bbb !important;
 }
 
 .bg-ccc {
-	background-color: #ccc;
+	background-color: #ccc !important;
 }
 
 .bg-ddd {
-	background-color: #ddd;
+	background-color: #ddd !important;
 }
 
 .bg-eee {
-	background-color: #eee;
+	background-color: #eee !important;
 }
 
-.bg-f6f6f6 {
-	background-color: #f6f6f6;
+.bg-f0 {
+	background-color: #f0f0f0 !important;
 }
-
-.bg-fcfcfc {
-	background-color: #fcfcfc;
+.bg-f2 {
+	background-color: #f2f2f2 !important;
 }
-
+.bg-f4 {
+	background-color: #f4f4f4 !important;
+}
+.bg-f6 {
+	background-color: #f6f6f6 !important;
+}
+.bg-f8 {
+	background-color: #f8f8f8 !important;
+}
+.bg-fa {
+	background-color: #fafafa !important;
+}
+.bg-fb {
+	background-color: #fbfbfb !important;
+}
+.bg-fc {
+	background-color: #fcfcfc !important;
+}
+.bg-fd {
+	background-color: #fdfdfd !important;
+}
+.bg-fe {
+	background-color: #fefefe !important;
+}
 .bg-fff {
-	background-color: #fff;
+	background-color: #fff !important;
 }
 
 
@@ -1107,75 +1129,93 @@
 /*-------------------------------------------*/
 /*--------  A ESCALA en TINT y SHADE  -------*/
 .text-000 {
-	color: #000;
+	color: #000 !important;
 }
-
 .text-111 {
-	color: #111;
+	color: #111 !important;
 }
 
 .text-222 {
-	color: #222;
+	color: #222 !important;
 }
 
 .text-333 {
-	color: #333;
+	color: #333 !important;
 }
 
 .text-444 {
-	color: #444;
+	color: #444 !important;
 }
 
 .text-555 {
-	color: #555;
+	color: #555 !important;
 }
 
 .text-666 {
-	color: #666;
+	color: #666 !important;
 }
 
 .text-777 {
-	color: #777;
+	color: #777 !important;
 }
 
 .text-888 {
-	color: #888;
+	color: #888 !important;
 }
 
 .text-999 {
-	color: #999;
+	color: #999 !important;
 }
 
 .text-aaa {
-	color: #aaa;
+	color: #aaa !important;
 }
 
 .text-bbb {
-	color: #bbb;
+	color: #bbb !important;
 }
 
 .text-ccc {
-	color: #ccc;
+	color: #ccc !important;
 }
 
 .text-ddd {
-	color: #ddd;
+	color: #ddd !important;
 }
 
 .text-eee {
-	color: #eee;
+	color: #eee !important;
 }
 
-.text-f6f6f6 {
-	color: #f6f6f6;
+.text-f0 {
+	color: #f0f0f0 !important;
 }
-
-.text-fcfcfc {
-	color: #fcfcfc;
+.text-f2 {
+	color: #f2f2f2 !important;
 }
-
+.text-f4 {
+	color: #f4f4f4 !important;
+}
+.text-f6 {
+	color: #f6f6f6 !important;
+}
+.text-f8 {
+	color: #f8f8f8 !important;
+}
+.text-fa {
+	color: #fafafa !important;
+}
+.text-fc {
+	color: #fcfcfc !important;
+}
+.text-fd {
+	color: #fdfdfd !important;
+}
+.text-fe {
+	color: #fefefe !important;
+}
 .text-fff {
-	color: #fff;
+	color: #fff !important;
 }
 
 .text-theme1 {

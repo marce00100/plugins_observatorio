@@ -40,13 +40,16 @@ function carga_estilosreg() {
   /* Carga Font Awesome */
   wp_enqueue_style('load-fa', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css');
   /* Carga estilo comun theme para plugin */
-  wp_enqueue_style('theme-frctl', XFL_Core::getUrl() . 'assets/libs-ext/sty-02/assets/skin/default_skin/css/theme-frctl.css', array(), '1.0.5', 'all');
+  wp_enqueue_style('theme-frctl'
+            , XFL_Core::getUrl() . 'assets/libs-ext/sty-02/assets/skin/default_skin/css/theme-frctl.css'
+            , array(), 
+            '1.0.9', 'all');
   
   /* Carga stilo propio*/
   wp_enqueue_style('estilo.css'
                   , XFL_Core::getUrl() . 'assets/css/estilo.css'
                   , array()
-                  , '1.0.64');
+                  , '1.0.67');
   
   /** ------------------ J S ---------------------------------- */
   /* scrips js */
