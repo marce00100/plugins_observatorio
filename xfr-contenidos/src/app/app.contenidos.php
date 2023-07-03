@@ -1,5 +1,6 @@
 <?php
 /** Comentar para LARAVEL , descomentar cuando controller y routes del plug */
+require_once $xfrContenidos->path . "src/app/FuncionesContenidosController.php"; 
 require_once $xfrContenidos->path . "src/app/ContenidosController.php"; 
 require_once $xfrContenidos->path . "src/app/ContenidosBJController.php"; 
 require_once $xfrContenidos->path . "src/app/ContenidosMigrateController.php"; 

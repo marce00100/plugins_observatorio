@@ -75,12 +75,12 @@ ob_start();
   }
 </style>
 		<div id="wrap_contenidos" class="bg-content frctl">
-				<div class=" bg-white col-xs-12 col-sm-12 col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-9 col-xl-offset-2 col-xl-8  ">
+				<div class=" bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
 					<div class="pl40 mb10">
 						<h2 class="fw600 text-555 ">Gestión de Contenidos</h2>
 					</div>
 					
-					<div class="panel br8 pb5"  style="width: 97%;    box-shadow: 1px 2px 9px 1px;">
+					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
             <div class="panel-heading  bg-dark dark  bg-primary--60_ mb10 p20 br8 br-a br-primary " style="height: auto; line-height: normal;">
 							<div class="text-white-dark mtn mbn fs16 flex align-center justify-evenly wrap gap-10">
 								<i class="fa fa-paperclip fa-lg grow-1"></i> 
@@ -117,20 +117,13 @@ ob_start();
 					<!-- panel body -->
 					<div class="panel-body of-a">
 						<div class="row">
-							<div class=" ph40 text-555 ">
+							<div class=" ph40 text-444 ">
 								<!-- datos de usuario -->
 								<div __fields></div>
                 <div __campos_extra></div>
+                <div __archivos_anexos></div>
 
-                <div class="rg-bloque rg-col-4">
-                  <label class="form-label">Archivos anexos</label>
-                  <div class="br-a br-greyer br-b-n bg-light p5 pl20 br-box">  
-                    <button class="btn btn-sm btn-dark br6" onclick="document.getElementById('input_file_archivo').click()">Seleccionar archivo</button>
-                    <input __input_file_archivo type="file" class="hide" name="" id="input_file_archivo">
-                  </div>
-                  <div __archivos_anexos class="p10 fs14 br-a br-greyer "></div>                
-                </div>
-                <!-- <textarea name="" id="" __rg_field="contenido"  cols="30" rows="10"></textarea> -->
+                
 								<hr>
               </div>
 						</div>
@@ -158,8 +151,7 @@ ob_start();
       dataTableTarget: "#dataT",
       dataList: [],
       tipo_contenido: '',
-      paramsTipoCont: [],
-      fileList: []
+      paramsTiposCont: [],
     }
 
     let regmodel = {
@@ -193,26 +185,26 @@ ob_start();
               },
               {
                 field: 'fecha_publicacion', type: 'date', label: 'Fecha de Publicación', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: 'mnw300', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
+                required: false, columns_4: 1, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
               },
               {
                 field: 'orden', type: 'number', label: 'Grado de posición', placeholder: '', title: 'El mayor número se mostrará al principio, y sucesivamente hasta el menor número', help: '',
-                required: false, columns_4: 2, class: { bloque: 'mnw300', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
+                required: false, columns_4: 1, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
               },
               {
                 field: 'estado_contenido', type: 'select', label: 'Estado', placeholder: '', title: '', help: '',
-                required: true, columns_4: 2, class: { bloque: 'mnw300', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+                required: true, columns_4: 1, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
                 field: 'contenido', type: 'richtext', label: 'Contenido', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100 fs14' },
               },
             ]
           },
         ],
       },
       listasPredefinidas: {
-        estados: [{ key: 1, texto: 'ACTIVO' }, { key: 0, texto: 'INACTIVO' }],
+        estados: [{ key: 1, texto: 'ACTIVO' }, {key: 0, texto:'INACTIVO' }],
       },
       /** Crea toda todas las secciones y sus filds */
       create_fields: (sections) => {
@@ -241,7 +233,7 @@ ob_start();
             if (field.type == 'text' || field.type == 'number' || field.type == 'date' || field.type == 'password' || field.type == 'email') {
               let htmlField =
                   /*html*/`
-                  <div class="rg-bloque rg-col-${field.columns_4} ${field.class.bloque || ''} ${field.class.bloque || ''} " >
+                  <div class="rg-bloque rg-col-${field.columns_4} ${field.class.bloque || ''} " >
                     <div class="form-group  ${field.class.group || ''}  mbn">
                         <label  class="control-label ${field.class.label || ''}" for="${field.field}"
                         style="">${field.label}</label>
@@ -284,7 +276,8 @@ ob_start();
                         <div class="">
                             <span class="append-icon_ left_"><i class=""></i>
                             </span>
-                            <textarea class="${field.class.input || ''} form-control pl10" id="${field.field}" ${sec.attr_field}="${field.field}" name="${field.field}"
+                            <textarea class="${field.class.input || ''} form-control pl10" style="font-size:14px" 
+                            id="${field.field}" ${sec.attr_field}="${field.field}" name="${field.field}"
                             title="${field.title}"  ${field.required ? 'required' : ''} ></textarea>
                             <em class="fs12 text-dark block">${field.help}</em>
                         </div>
@@ -298,22 +291,24 @@ ob_start();
                               height: 100, //set editable area's height
                               minHeight: 100,
                               focus: false, //set focus editable area after Initialize summernote
+                              fontSizes: ['8', '9', '10', '11', '12', '14','16', '18', '20', '24', '28', '32', '36', '40', '48', '56', '64', '72'],
                               toolbar: [
-                                ['style', [/*'style',*/ 'bold', 'italic', 'underline', /*'clear' */ ] ],
+                                ['style', ['style', 'bold', 'italic', 'underline', /*'clear' */ ] ],
                                 /* ['font', ['strikethrough']], */
-                                /* ['fontsize', ['fontsize']],*/
+                                ['fontsize', ['fontsize']],
                                 /* ['color', ['color']], */
                                 ['para', ['ul', 'ol', 'paragraph']],
-                                /* ['height', ['height']], */
-                                ['insert', ['link', 'picture', 'video']],
-                                ['table', ['table']], 
-                                ['view', ['codeview']] 
+                                // ['height', ['height']], 
+                                ['insert', ['link', 'picture', 'video', 'table']],
+                                ['clear', ['clear']], 
+                                ['view', ['codeview']],
                               ],
                               lang: 'es-ES',
                               oninit: function () { },
                               onChange: function (contents, $editable) { },
 
                             });
+                fieldsContainer.find(`[${sec.attr_field}=${field.field}]`).summernote('fontSize', 14);
               }
             }
             if (field.type == 'checkbox') {
@@ -337,17 +332,23 @@ ob_start();
                   /*html*/`
                   <div class="rg-bloque rg-col-${field.columns_4} ${field.class.bloque || ''} ">
                     <div class="form-group ${field.class.group || ''} mbn ">
-                        <label class="control-label ${field.class.label}" for="${field.field}" style="">${field.label}</label>
-                        <input type="file" __archivo_up __imagen_guardada __imagen_nueva class="p5 form-control pl10 " id="${field.field}" ${sec.attr_field}="${field.field}" name="${field.field}" title="${field.title}"  ${field.required ? 'required' : ''} accept="image/*">
-                        <div class="wp100 h-150 bg-light br-a br-box">
-                          <div style=" width:150px; height: 147px; background-color:#000; margin: auto; ">
-                          <img __imagen_img="" src="" >
-                        </div></div>
+											<label class="control-label ${field.class.label}" for="${field.field}" style="">${field.label}</label>
+											<div class="br-a br-greyer br-b-n bg-primary-80 darker -80 p5 pl20 br-box">
+												<button class="btn btn-sm fs13 ph20 btn-dark br6" onclick="document.getElementById('${field.field}').click()">Seleccionar imagen</button>
+												<input type="file" __archivo_up __imagen_nueva class="hide "
+												id="${field.field}" ${sec.attr_field}="${field.field}" name="${field.field}" title="${field.title}"  ${field.required ? 'required' : ''} accept="image/*">
+											</div>
+											<div class="wp100 h-150 bg-light dark_ br-a br-box">
+												<div style=" width:150px; height: 147px; background-color:#000; margin: auto; ">
+													<img __imagen_img="" src="" >
+												</div>
+											</div>
                     </div>
                   </div>`;
 
               fieldsContainer.append($(htmlField));
-
+              /* se deasignan cualquier evento sobre el boton file */
+              $(contenedor).off('change',  `[${sec.attr_field}=${field.field}]`);
               /* define el evento listener change al cambiar imagen previzualiza la imagen en el cuadro, tambien coloca el nombre de la imagen en al atributo imagen_nueva */
               $(contenedor).on('change', `[${sec.attr_field}=${field.field}]`, function () {
                 let inputFile = $(this);
@@ -376,18 +377,10 @@ ob_start();
         $("[__rg_field=estado_contenido]").html(optsEstados);
         $("[__rg_field=estado_contenido] option")[0].selected = true; /** inicializa en la primera opcion que es Activo */
 
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'tipo_contenido'}, res =>{
-          let optsTipoContenido = xyzFuns.generaOpciones(res.data, 'nombre', 'descripcion');
-          $("[__rg_field=tipo_contenido]").html(optsTipoContenido);
-        });
-
-
-
-        // let tipo_contenido = xyzFuns.generaOpcionesArray(regmodel.listasPredefinidas.tipo_contenido);
-        // $("[__rg_field=tipo_contenido]").html(tipo_contenido);
-        // $("[__rg_field=tipo_contenido] option")[0].selected = true;
-
-
+        /* por defecto el orden es 1 para que se ordenen por fecha publicacion*/
+        $("[__rg_field=orden]").val(1);
+        /* se coloca la fecha de hoy */
+        $("[__rg_field=fecha_publicacion]").val(moment(new Date()).format('YYYY-MM-DD'));
 
       },
       /** Crea el formulario e inicializa los selects*/
@@ -411,17 +404,128 @@ ob_start();
             }
         })
 
-        /* personalizado para tabla nims*/
-        if (selectorFieds == '[__nims_operador]') {
-          if ($(`${container} ${selectorFieds}[required] table tbody tr:visible`).length == 0) {
-            noCumplen.push('numero_NIM');
-            $(selectorFieds).addClass(regmodel.model.classError);
-          }
-        }
-
         return noCumplen;
       }
 
+
+    }
+
+    let comps = {
+      /*Componente para los campos extras */
+      extraFields: {
+        getHtml: (obj) => {
+          let html = /*html*/`
+                <div class="rg-bloque rg-col-4 ">
+                  <div class="form-group  mbn ">
+                    <label class="control-label form-label"
+                    style="">${obj.etiqueta}</label>
+                    <div class="">
+                        <span class="append-icon_ left_"><i class=""></i>
+                        </span>
+                        <textarea class="form-input p5 wp100 form-control pl10" style="height: 38px" id="${obj.nombre}" __campo_extra="${obj.nombre}" ></textarea>
+                    </div>
+                  </div>
+                </div>`;
+          return html;
+        },
+        /** extrafields, array de ojetos con pares  */
+        create: (extraFields) => {
+          let fields = '';//$(/*html*/`<div></div>`);
+          _.forEach(extraFields, (item) => {
+            let xfield = comps.extraFields.getHtml(item); 
+            // extraFields.append(xfield);
+            fields += xfield;
+          })
+          return fields;
+        },
+        get: () => {
+          let campos_extra = {};
+          _.forEach($("[__campos_extra] textarea"), (item)=> {
+            let campo_extra = $(item).attr('__campo_extra');
+            campos_extra[campo_extra] = $(item).val(); 
+          });
+          return campos_extra;
+        },
+        /* obj es del tipo {nombr1e:valor1, nombre2:valor3, hora_fin:23,}*/
+        set: (campos_extra) => {
+          _.forEach($("[__campos_extra] textarea"), (item)=>{
+            let campo_extra = $(item).attr('__campo_extra');
+            $(item).val(campos_extra[campo_extra]);
+          });
+        },
+        // view: () => {
+
+        // }
+
+      },
+      /*Componente de archivos */
+      archivos: {
+        getHtml: () => {
+          let html = /*html*/`
+                <div class="rg-bloque rg-col-4">
+                  <label class="form-label">Archivos anexos</label>
+                  <div class="br-a br-greyer br-b-n bg-light p5 pl20 br-box">  
+                    <button class="btn btn-sm fs13 ph20 btn-dark br6" onclick="document.getElementById('input_file_archivo').click()">Seleccionar archivo</button>
+                    <input __input_file_archivo type="file" class="hide" name="" id="input_file_archivo" multiple>
+                  </div>
+                  <div __archivos class="p10 fs14 br-a br-greyer "></div>                
+                </div>`;
+          comps.archivos.listens();
+          return html;
+        },
+        getHtmlArchivoItem: (objFile) => {
+          return /*html*/`
+                  <div __archivo_item __estado="${objFile.estado}" __archivo_server="${objFile.archivo}" __archivo_nombre="${objFile.nombre}" class="mb5 flex bg-success-80_ p5 br-a br-greyer pl15 br6 justify-between wp80" style="background-color:#e9ffd6">
+                    <span __archivo_nombre >${objFile.nombre}</span>
+                    <span __remove_btn class="cursor p5 mr10 fa fa-remove"></span>
+                  </div>`;
+        },
+        listens: () => {
+          /* se desasignan los eventos por si se estuvieran cargando mas de una vez*/
+          $(ctxG.modal)
+            .off('change', '[__input_file_archivo]')
+            .off('click', '[__archivos] [__remove_btn]');
+          /* se asignan los eventos oyentes*/
+          $(ctxG.modal)
+            .on('change', "[__input_file_archivo]", (e) => {
+              let files = $("[__input_file_archivo]")[0].files;
+              for (let i = 0; i < files.length; i++) {
+                let file = files[i];
+                let objFile = { nombre: file.name, archivo: '', estado: 'nuevo' }
+                let elemArchivo = $(comps.archivos.getHtmlArchivoItem(objFile));
+                elemArchivo.data('file', file);
+                $('[__archivos]').append(elemArchivo);
+              }
+            })
+          .on('click', '[__archivos] [__remove_btn]', function () {
+              let elemArchivo = $(this).closest('[__archivo_item]');
+              elemArchivo.hide().attr('__estado', 'delete');
+            });          
+        }, 
+        create: () => {
+          return comps.archivos.getHtml();
+        },
+        get: () => {
+          let archivos = [];
+          _.forEach($("[__archivo_item]"), (item)=>{
+            let elemArchivo = $(item);            
+            let objElem = {
+              nombre: elemArchivo.attr('__archivo_nombre'),
+              archivo: elemArchivo.attr('__archivo_server'),
+              estado: elemArchivo.attr('__estado'),
+            }
+            archivos.push(objElem);
+          })
+          return  archivos;
+        },
+        set: (archivos) => {
+          _.forEach(archivos, (item) => {
+            let objFile = { nombre: item.nombre, archivo: item.archivo, estado: 'server' }
+            let elemArchivo = $(comps.archivos.getHtmlArchivoItem(objFile));
+            $('[__archivos]').append(elemArchivo);
+          })
+        }
+      }
 
     }
 
@@ -451,8 +555,7 @@ ob_start();
               ctxG.dataList = conT.dt.rows().data();
               /* para obtener la data , en la seccion complete se encuentra en la propiedad de responseJSON*/
               let respuesta = res.responseJSON;              
-              // $('[__cabecera_dt]').html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()} `);
-              $(`${ctxG.modal} [__cabecera_modal]`).html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()}`);
+              $(`${ctxG.modal} [__cabecera_modal]`).html(`${respuesta.dataTipoContenido.paramTipoContenido.descripcion.toUpperCase()}`);
               funs.spinner(0);
             }
 					},
@@ -484,7 +587,7 @@ ob_start();
             {
               title: 'Publicación', data: 'fecha_publicacion', orderable: true,
               render: function (data, type, row, meta) {
-                return /*html*/`${moment(row.fecha_publicacion).format('DD/MM/YYYY')}`;
+                return /*html*/`${row.fecha_publicacion ? moment(row.fecha_publicacion).format('DD/MM/YYYY') : ''}`;
               }
             },
             {
@@ -520,7 +623,7 @@ ob_start();
 
           $("[__tipo_contenido] option")[4].selected = true; 
           ctxG.tipo_contenido = $("[__tipo_contenido]").val();
-          ctxG.paramsTipoCont = res.data;
+          ctxG.paramsTiposCont = res.data;
           conT.fillDataT();
           funs.crearFormulario();
         });
@@ -530,27 +633,13 @@ ob_start();
         regmodel.create_fields(regmodel.model.sections);
         regmodel.inicializaControles();
 
-        $("[__campos_extra]").html('');
-        let paramTipoCont = _.find(ctxG.paramsTipoCont, (item)=> {
+        let paramTipoCont = _.find(ctxG.paramsTiposCont, (item)=> {
           return item.nombre == ctxG.tipo_contenido;
         });
         let paramConfig = JSON.parse(paramTipoCont.config);
-        _.forEach(paramConfig.campos_extra, (item) => {
-          let html = /*html*/`
-                  <div class="rg-bloque rg-col-4 ">
-                    <div class="form-group  mbn ">
-                        <label class="control-label form-label"
-                        style="">${item.etiqueta}</label>
-                        <div class="">
-                            <span class="append-icon_ left_"><i class=""></i>
-                            </span>
-                            <textarea class="form-input p5 wp100 form-control pl10" style="height: 38px" id="${item.nombre}" __campo_extra="${item.nombre}" ></textarea>
-                        </div>
-                    </div>
-                  </div>`;
-          $("[__campos_extra]").append(html);
-        })
-        
+        let camposExtrahtml = comps.extraFields.create(paramConfig.campos_extra);
+        $("[__campos_extra]").html(camposExtrahtml);   
+        $("[__archivos_anexos]").html(comps.archivos.create());     
 
       },
       /** Para  nuevo muestramodal vacio */
@@ -572,87 +661,72 @@ ob_start();
           funs.spinner(false)
         })
       },
-      /** Obtiene toda la info de un contenido,  */
-      getData: () => {
-        let data = xyzFuns.getData__fields('__rg_field');
-        data.imagen = data.imagen.split('\\').pop();
-        data.contenido = $("[__rg_field=contenido]").summernote('code');
-        data.tipo_contenido = ctxG.tipo_contenido;
-
-        let campos_extra = {};
-        _.forEach($("[__campos_extra] textarea"), (item)=> {
-          let campo_extra = $(item).attr('__campo_extra');
-          campos_extra[campo_extra] = $(item).val(); 
-        })
-        data.campos_extra = campos_extra;
-
-        data.archivos = [];
-        _.forEach(ctxG.fileList, (file)=>{
-          data.archivos.push(file.name);
-        })
-        return data;
-      },
       /** */
       setData: function (obj) {
+        /* carga la imagen, luego elimina la propiedad field, asi ya no carga el input:file */
         let imagen = obj.imagen;
         $("[__imagen_img]").attr('src', imagen);
         delete obj.imagen;
 
         xyzFuns.setData__fields(obj, '__rg_field');
-
+        /* contenido */
         $('[__rg_field=contenido]').summernote('code', obj.contenido);
-
-        _.forEach($("[__campos_extra] textarea"), (item)=>{
-          let campo_extra = $(item).attr('__campo_extra');
-          $(item).val(obj.campos_extra[campo_extra]);
-        });
-
-
+        /* los campos extras */
+        comps.extraFields.set(obj.campos_extra);
+        /* la lista de archivos*/
+        comps.archivos.set(obj.archivos)
+      },
+      /** Obtiene toda la info de un contenido,  */
+      getData: () => {
+        let data = xyzFuns.getData__fields('__rg_field');
+        data.tipo_contenido = ctxG.tipo_contenido;
+        /* La imagen caratula */
+        data.imagen = data.imagen.split('\\').pop();
+        /* el contenido */
+        data.contenido = $("[__rg_field=contenido]").summernote('code');
+        /*Los campos extra  */
+        data.campos_extra = comps.extraFields.get();
+        /* Los archivos anexos */
+        data.archivos = comps.archivos.get();
+        return data;
       },
       /** Guarda al contenido */
       saveData: () => {
         xyzFuns.alertMsgClose('[__error]');
         let cumpleRequireds = regmodel.noCumplenValidacion('[__fields]', '[__rg_field]').length == 0;
         if (!cumpleRequireds) {
-          // xyzFuns.alertMsg("[__error]", `Se deben llenar los campos requeridos`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
-          // return;
+          xyzFuns.alertMsg("[__error]", `Se deben llenar los campos requeridos`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
+          return;
+        }
+        // funs.spinner();
+        let fields = funs.getData();
+        console.log(fields)
+
+        let formData = new FormData();
+        formData.append('data_contenido_JSON', JSON.stringify(fields));
+
+        if($('[__rg_field=imagen]').attr('__imagen_nueva') != '' ) {
+          if ($('[__rg_field=imagen]')[0].files.length > 0) {
+            formData.append('imagen', $('[__rg_field=imagen]')[0].files[0]);
+            formData.append('imagen_s', $('[__rg_field=imagen]')[0].files[0]);
+          }
+        }
+        /* para los archivos se carga el formdata */
+        if($("[__archivo_item][__estado=nuevo] ").length > 0){
+          _.forEach($("[__archivo_item][__estado=nuevo] "), (item)=>{
+            let elemArchivo = $(item);
+            let file = elemArchivo.data('file');
+            formData.append('archivos[]', file);
+          })
         }
 
-        funs.spinner();
-        let obj = funs.getData();
-        console.log(obj)
-        $.post(ctxG.rutabase + '/save-content', obj , function (resp) {
-          if (resp.status == 'error') {
-            xyzFuns.alertMsg("[__error]", `Error: ${resp.msg}`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
-          }
-          // obj.id_contenido ? conT.refreshRow(resp.data) : conT.refreshDataT();
-          // conT.refreshDataT();
-
-          /* Se verifica si estan cargados y se envian los archivos */
-          let formData = new FormData();
-          formData.append('tipo_contenido', obj.tipo_contenido);
-          if($('[__rg_field=imagen]').attr('__imagen_guardada') != $('[__rg_field=imagen]').attr('__imagen_nueva') ){
-
-            if ($('[__rg_field=imagen]')[0].files.length > 0) {
-              formData.append('imagen', $('[__rg_field=imagen]')[0].files[0]);
-              formData.append('imagen_s', $('[__rg_field=imagen]')[0].files[0]);
-            }
-          }
-          
-          if(ctxG.fileList.length > 0){
-            _.forEach(ctxG.fileList, (file) => {
-              formData.append('archivos[]', file);
-            })
-          }
-          
-          /* Envio de la imagen principal */
-          $.ajax({
-            url: ctxG.rutabase + '/file-upload',
+        $.ajax({
+            url: ctxG.rutabase + '/save-content-upload',
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
-            success: function (response) {
+            success: function (resp) {
               if (resp.status == 'error') {
                 xyzFuns.alertMsg("[__error]", `Error: ${resp.msg}`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
               }
@@ -667,20 +741,9 @@ ob_start();
               if($.fn.DataTable.isDataTable(conT.dt))
                 conT.dt.destroy();
               conT.fillDataT();
-              xyzFuns.closeModal();
+              // xyzFuns.closeModal();
             } 
           })
-
-          new PNotify({
-            title: resp.status == 'ok' ? 'Guardado' : 'Error',
-            text: resp.msg,
-            shadow: true,
-            opacity: 0.9,
-            type: (resp.status == 'ok') ? "success" : "danger",
-            delay: 1500
-          });
-          // xyzFuns.closeModal();
-        });
       },
       limpiarModal: () => {
         $(`${ctxG.modal} [__rg_field]`).val('').removeClass('br-a br-danger');
@@ -688,10 +751,6 @@ ob_start();
         /* Quita las clases de error en todos los campos requeridos  */
         $("[required]").removeClass(regmodel.model.classError);
         xyzFuns.alertMsgClose('[__error]');
-
-        ctxG.fileList = [];
-        $("[__archivos_anexos]").html('');
-
       },
       spinner: (obj = {}) => {
         xyzFuns.spinner(obj, ctxG.content)
@@ -736,30 +795,7 @@ ob_start();
         .on('click', "[__alert_msg] .close", (e) => {
           $(e.currentTarget).closest('[__alert_msg]').remove();
         })
-
-        .on('change', "[__input_file_archivo]", function(){
-          var files = $(this)[0].files;
-          for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            var fileName = file.name;
-            var fileSize = file.size;
-            var listItem = $(/*html*/`
-                <div __archivo_item class="mb5 flex justify-between wp80">
-                  <span>${fileName}</span>
-                  <span __remove_btn class="cursor p5 mr10 fa fa-remove"></span>
-                </div>`);
-
-            listItem.data('file', file);
-            ctxG.fileList.push(file);
-            $('[__archivos_anexos]').append(listItem);
-          }
-        })
-        .on('click', '[__archivos_anexos] [__remove_btn]', function(){
-          var listItem = $(this).closest('[__archivo_item]');
-          var file = listItem.data('file');
-          ctxG.fileList.splice(ctxG.fileList.indexOf(file), 1);
-          listItem.remove();
-        });
+    
     }
 
     let init = (() => {

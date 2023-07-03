@@ -1,9 +1,17 @@
 <?php
 
 use frctl\MasterController;
+use FuncionesContenidosController as FuncionesContenidos;
 
 
 class ContenidosMigrateController extends MasterController {
+  /* Propiedad que es la instancia de Funciones Contenidos */
+  public $funcionesContenidos;
+
+  public function __construct() {
+    $this->funcionesContenidos = new FuncionesContenidos();
+  } 
+
   /**
    * POST para migrar las tablas del Observatorio 
    */
@@ -76,7 +84,7 @@ class ContenidosMigrateController extends MasterController {
       $list = collect($DB->select("SELECT * FROM {$tabla_target}"));
       foreach ($list as $item) {
         /* Quita los htmls y caracteres especiales convitirndo a UTF8 */
-        $item->texto     = html_entity_decode(self::quitarHtmlTags($item->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $item->texto     = html_entity_decode($this->funcionesContenidos->quitarHtmlTags($item->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $item->tipo_contenido = strtolower(substr($item->titulo, 0, 8)) == 'comunica' ? 'comunicados' : 'noticias';
         $item->updated_at     = $this->now();
 
@@ -130,7 +138,7 @@ class ContenidosMigrateController extends MasterController {
                                       html_entity_decode($item->noticia, ENT_QUOTES | ENT_HTML5, 'UTF-8') : 
                                       html_entity_decode($item->actividad, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        $cont->texto             = html_entity_decode(self::quitarHtmlTags($cont->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $cont->texto             = html_entity_decode($this->funcionesContenidos->quitarHtmlTags($cont->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $cont->imagen            = $item->imagen;
         $cont->orden             = 1;
         $cont->estado_contenido  = 1;
@@ -258,12 +266,5 @@ class ContenidosMigrateController extends MasterController {
   }
 
 
-  /**
-   * Quita los tags html, styles y su contenido, xml, etc  
-   */
-  public static function quitarHtmlTags($textoHtml) {
-    $contenidoSinTags = preg_replace('/<w[^>]*>[^>]*<\/w[^>]*>|<xml>[^>]*<\/xml>|<style>[^>]*<\/style>|<script>[^>]*<\/script>|<[^>]*>/', '', $textoHtml);
-    $contenidoSinTags = trim($contenidoSinTags);
-    return $contenidoSinTags;
-  }
+
 }

@@ -1,10 +1,10 @@
 <?php
 $contenidoPrefijRuta = "cont/v1/";
 
-Route::post($contenidoPrefijRuta, 'get-contents'   , 'Contenidos@getContents');
-Route::post($contenidoPrefijRuta, 'get-content'    , 'Contenidos@getContent');
-Route::post($contenidoPrefijRuta, 'save-content'   , 'Contenidos@saveContenido');
-Route::post($contenidoPrefijRuta, 'file-upload'    , 'Contenidos@fileUpload');
+Route::post($contenidoPrefijRuta, 'get-contents'          , 'Contenidos@getContents');
+Route::post($contenidoPrefijRuta, 'get-content'           , 'Contenidos@getContent');
+Route::post($contenidoPrefijRuta, 'save-content-upload'   , 'Contenidos@saveContenidoUpload');
+// Route::post($contenidoPrefijRuta, 'file-upload'    , 'Contenidos@fileUpload');
 
 Route::post($contenidoPrefijRuta, 'contents-bj'    , 'ContenidosBJ@contentsBJ');
 Route::post($contenidoPrefijRuta, 'get-content-bj' , 'ContenidosBJ@getContentBJ');

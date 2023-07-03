@@ -66,12 +66,8 @@ ob_start(); ?>
 		<div id="wrap_contenidos" class="bg-content frctl">
 
 			<div class="pv20 ph5 font-roboto">
-				<div class=" bg-white col-xs-12 col-sm-offset-1 col-sm-11  col-md-offset-1 col-md-11 col-lg-offset-1 col-lg-10  " >
-					<!-- <div class="p20 pb10">
-						<h3 class="fw600 text-999 ">Gestión de Contenidos</h3>
-					</div> -->
-					
-					<div class="panel">
+				<div class=" bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  " >					
+					<div class="panel wp97">
 						<div class="panel-heading bg-theme1--20_ mb20" style="background-color: #1d2f4e;">
 							<div class="panel-title text-white-dark">
 								<i class="glyphicons glyphicons-tags fa-lg"></i> <span class="ml10 " __cabecera_dt></span>
@@ -165,8 +161,8 @@ ob_start(); ?>
               ctxG.dataList = conT.dt.rows().data();
               /* para obtener la data , en la seccion complete se encuentra en la propiedad de responseJSON*/
               let respuesta = res.responseJSON;              
-              $('[__cabecera_dt]').html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()} `);
-              $(`${ctxG.modal} [__cabecera_modal]`).html(`${respuesta.data_tipo_contenido.param_tipo_contenido.descripcion.toUpperCase()}`);
+              $('[__cabecera_dt]').html(`${respuesta.dataTipoContenido.paramTipoContenido.descripcion.toUpperCase()} `);
+              $(`${ctxG.modal} [__cabecera_modal]`).html(`${respuesta.dataTipoContenido.paramTipoContenido.descripcion.toUpperCase()}`);
             }
 					},
           searchDelay: 800, // Retardo de búsqueda en milisegundos
@@ -192,8 +188,8 @@ ob_start(); ?>
                       <div class="pv10 row fs15 flex wrap ph20" style="" __cont_id_contenido="${row.id_contenido}" __index="${meta.row}">
 
                         <div class="col-xs-12 col-sm-12 hidden-md hidden-lg hidden-xl mb20">
-                          <h3>${row.titulo}</h3>
-                          <span class="text-666 fs13">Publicado en: ${moment(row.fecha_publicacion).format('DD/MM/YYYY')}</span>
+                          <h3 __ver_contenido="${row.id_contenido}" class="cursor">${row.titulo}</h3>
+                          <span class="text-666 fs13">Publicado en: ${row.fecha_publicacion ? moment(row.fecha_publicacion).format('DD/MM/YYYY') : ''}</span>
                           <span class="text-666 fs13 ml20"><i class="glyphicons glyphicons-eye_open mr5"></i> <span __cont_numero_vistas="${row.numero_vistas}">${row.numero_vistas}</span></span> 
                         </div>   
 
@@ -201,11 +197,11 @@ ob_start(); ?>
 
                         <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7 flex flex-y justify-between ml20 text-justify" style="height:100%">
                           <div clasS=" hidden-sm hidden-xs">
-                            <h3>${row.titulo}</h3>
-                            <span class="text-666 fs13">Publicado en: ${moment(row.fecha_publicacion).format('DD/MM/YYYY')}</span>
+                            <h3 __ver_contenido="${row.id_contenido}" class="cursor">${row.titulo}</h3>
+                            <span class="text-666 fs13">Publicado en: ${row.fecha_publicacion ? moment(row.fecha_publicacion).format('DD/MM/YYYY') : ''}</span>
                             <span class="text-666 fs13 ml20"><i class="glyphicons glyphicons-eye_open mr5"></i> <span  __cont_numero_vistas="${row.numero_vistas}">${row.numero_vistas}</span></span> 
                           </div>
-                          <div class="mt20">${row.resumen} ... </div>
+                          <div class="mt20">${row.resumen}</div>
                           <div class="text-center mt20">
                             <button __ver_contenido="${row.id_contenido}" class="btn btn-sm bg-primary-80 br-a br-greyer br8 font-family "> Ver mas </button> 
                           </div>
