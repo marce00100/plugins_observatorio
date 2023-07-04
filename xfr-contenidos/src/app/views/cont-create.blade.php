@@ -123,16 +123,14 @@ ob_start();
                 <div __campos_extra></div>
                 <div __archivos_anexos></div>
 
-                
-								<hr>
               </div>
 						</div>
 					</div>
 					<!-- panelfooter -->
-					<div class="panel-footer flex wrap justify-evenly">
+					<div class="panel-footer pv40 flex wrap br-t justify-evenly mt20">
 						<div __error class="wp100"></div>
 						<!-- CON ICONOS -->
-						<button __cerrar class="btn bg-marron--20 br-a br-dark -light br6 btn-md w150 fs14">Cerrar</button>
+						<button __cerrar class="btn bg-danger--20 darker br-a br-dark  br6 btn-md w150 fs14">Cerrar</button>
 						<button __save type="submit" class="btn bg-primary--20 dark br-a br-dark btn-md br6 w200 fs14">Guardar</button>
 					</div>
 				</div>
@@ -152,6 +150,20 @@ ob_start();
       dataList: [],
       tipo_contenido: '',
       paramsTiposCont: [],
+      mostrarMensajeFloat: function (obj) {
+        new PNotify({
+          title: obj.status == 'ok' ? 'Guardado' : 'Error',
+          text: obj.msg,
+          shadow: true,
+          opacity: 0.9,
+          // addclass: noteStack,
+          type: (obj.status == 'ok') ? "success" : "danger",
+          // stack: Stacks[noteStack],
+          width: obj.width || 300,
+          delay: obj.delay || 2000
+        });
+
+      },
     }
 
     let regmodel = {
@@ -747,12 +759,13 @@ ob_start();
               console.log('Error al subir la image_n.');
             },
             complete: function (res) {
-              console.log(res)
+              resp = res.responseJSON;
               funs.spinner(false);
               if($.fn.DataTable.isDataTable(conT.dt))
-                conT.dt.destroy();
+              conT.dt.destroy();
               conT.fillDataT();
               xyzFuns.closeModal();
+              // ctxG.mostrarMensajeFloat(resp);
             } 
           })
       },

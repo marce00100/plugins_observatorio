@@ -350,22 +350,19 @@ ob_start(); ?>
           })
         }
 
-        let archivos = (!obj.archivos || obj.archivos.length <= 0 ) ? '' : 
-          (function () {              
-              let htmlArchivosItem = _.reduce(obj.archivos, function (carry, elem, k) {
-                                        return carry + /*html*/
-                                          `<div>
-                                            <a href="${elem.archivoUrl}" target="_blank" class="text-primary-20 mt5"><i class="glyphicon glyphicon-cloud-download"></i> ${elem.nombre}</a>
-                                          </div>`}, '');
-                                        // return carry + /*html*/
-                                        //   `<div>
-                                        //     <a href="../wp-content/anexos/archivos/${objConfig.directorio}/${elem.archivo}" target="_blank"><i class="glyphicon glyphicon-cloud-download"></i> ${elem.nombre}</a>
-                                        //   </div>`}, '');
-              return /*html*/`
-                <div class="mt10"><div>Anexos</div>
-                  <div class="pl20">${htmlArchivosItem}</div>
-                </div>`;
-          })();
+        let archivos = (!obj.archivos || obj.archivos.length <= 0 ) ? '' 
+            : (function () {
+                let htmlArchivosItem =
+                  _.reduce(obj.archivos, function (carry, elem, k) {
+                    return carry + /*html*/
+                        `<div>
+                          <a href="${elem.archivoUrl}" target="_blank" class="text-primary-20 mt5"><i class="glyphicon glyphicon-cloud-download"></i> ${elem.nombre}</a>
+                        </div>`}, '');
+                return /*html*/`
+                    <div class="mt10"><div>Anexos</div>
+                      <div class="pl20">${htmlArchivosItem}</div>
+                    </div>`;
+              })();
 
         let htmlContenido = /*html*/`
 												<div class="fs15" __card __id_contenido="${obj.id_contenido}">
