@@ -698,9 +698,9 @@ function getStopWords() {
         'últimas',
         'último',
         'últimos',
-        'covid',
-        'covid-19',
-        'covid - 19',
+        // 'covid',
+        // 'covid-19',
+        // 'covid - 19',
         'hola',
         'tipo',
     ];

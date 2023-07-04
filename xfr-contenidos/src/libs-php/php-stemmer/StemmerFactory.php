@@ -1,7 +1,7 @@
 <?php
+namespace Wamania\Snowball;
 
-require_once $chatbot->path . "fcl-xp-chatbot/files/libs-php/php-stemmer/Stemmer/Spanish.php";
-// namespace Wamania\Snowball;
+require $xfrContenidos->path . "src/libs-php/php-stemmer/Stemmer/Spanish.php";
 
 // use voku\helper\UTF8;
 // use Wamania\Snowball\Stemmer\Catalan;
@@ -16,8 +16,8 @@ require_once $chatbot->path . "fcl-xp-chatbot/files/libs-php/php-stemmer/Stemmer
 // use Wamania\Snowball\Stemmer\Portuguese;
 // use Wamania\Snowball\Stemmer\Romanian;
 // use Wamania\Snowball\Stemmer\Russian;
-// use Wamania\Snowball\Stemmer\Spanish;
-// use Wamania\Snowball\Stemmer\Stemmer;
+use Wamania\Snowball\Stemmer\Spanish;
+use Wamania\Snowball\Stemmer\Stemmer;
 // use Wamania\Snowball\Stemmer\Swedish;
 
 class StemmerFactory

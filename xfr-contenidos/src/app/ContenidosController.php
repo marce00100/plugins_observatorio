@@ -1,6 +1,10 @@
 <?php
+require_once $xfrContenidos->path  . "src/libs-php/lib-normaliza.php";
+
 use frctl\MasterController;
+use frctl\Normaliza;
 use FuncionesContenidosController as FuncionesContenidos;
+
 class ContenidosController extends MasterController {
 
 	public $funcionesContenidos;
@@ -171,13 +175,17 @@ class ContenidosController extends MasterController {
 
 		$contenido->campos_extra = json_decode($contenido->campos_extra); 
 		$contenido->archivos = json_decode($contenido->archivos);
+		if (!empty($contenido->archivos))
+			foreach ($contenido->archivos as $archivo) {
+				$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
+			}
 		// $contenido->sistema = $site;
 
 		return (object)[
 			'data'    => $contenido,
 			'config'	=> $configsTipoCont->config,
-			'status' => 'ok',
-			'time'					       => microtime(true) - $tiempoInicio,
+			'status' 	=> 'ok',
+			'time'		=> microtime(true) - $tiempoInicio,
 		];
 	}
 
@@ -271,10 +279,15 @@ class ContenidosController extends MasterController {
 	 * la informacion del contenido esta en data_contenido_JSON
 	 */
 	public function saveContenidoUpload() {
+		$tiempoInicio = microtime(true);
 		// return;
 		$jsonData  = stripslashes($_POST['data_contenido_JSON']); /*Eliminar los escaper por demas '\\\' */
 		
 		$data = json_decode($jsonData);
+		/* Se obtiene el contenido antes de ser modificado */
+		$DB = $this;
+		$contenidoOld = collect($DB->select("SELECT * from xfr_contenidos where id = {$data->id_contenido}"))->first();
+
 		$contenido                       = (object)[];
 		$contenido->id                   = $data->id_contenido ?? null;
 		$contenido->tipo_contenido       = $data->tipo_contenido;
@@ -284,41 +297,16 @@ class ContenidosController extends MasterController {
 		$contenido->contenido            = $data->contenido;
 		$contenido->estado_contenido     = $data->estado_contenido;
 		$contenido->texto                = $data->texto ?? '';
-		$contenido->texto_corto          = $data->texto_corto ?? '';
 		$contenido->texto_token          = $data->texto_token ?? '';
 		$contenido->orden                = $data->orden ?? 1;
-		$contenido->campos_extra         = $data->campos_extra ? json_encode($data->campos_extra) : '';
-		$contenido->imagenes             = $data->imagenes ?? '';
-		
+		$contenido->campos_extra         = $data->campos_extra ? json_encode($data->campos_extra, JSON_UNESCAPED_UNICODE) : '';
+		// $contenido->imagenes             = $data->imagenes ?? '';
+		$contenido->texto 							 = $this->funcionesContenidos->quitarHtmlTags($contenido->contenido);
+		$contenido->texto_token					 = Normaliza::lematizaConStemSW($contenido->texto);
+
 		/* Si no llega imagen o vacio , entonces no se cambio la imagen*/
-		empty($data->imagen) ? false : $contenido->imagen = $data->imagen;
+		empty($data->imagen) ? false : $contenido->imagen = $this->funcionesContenidos->codigoUnico() . '.' . pathinfo($data->imagen, PATHINFO_EXTENSION);;
 
-		/* gestion Archivos controla los nuevos y los que se deben borrar */
-		$controlArchivos = (object)[];
-		$controlArchivos->nuevos = [];
-		$controlArchivos->delete = [];
-		$controlArchivos->archivos = [];
-		foreach (collect($data->archivos) as $archivo) {
-			if ($archivo->estado == 'nuevo') {
-				$objArch = (object)[];
-				$objArch->nombre = str_replace(' ', '_', $archivo->nombre);
-				$objArch->archivo = $objArch->nombre . '__' . $this->funcionesContenidos->codigoUnico(). '.' . pathinfo($archivo->nombre, PATHINFO_EXTENSION);
-				$controlArchivos->nuevos[] = $objArch; 
-				$controlArchivos->archivos[] = $objArch;
-			}
-			if($archivo->estado == 'delete'){
-				// unset($archivo->estado);
-				$controlArchivos->delete[] = $archivo; 
-			}
-			if ($archivo->estado == 'server') {
-				unset($archivo->estado);
-				$controlArchivos->archivos[] = $archivo; 
-			}
-		}
-		$contenido->archivos = count($controlArchivos->archivos) > 0 ? json_encode($controlArchivos->archivos) : '';
-		
-
-		
 		$user_id = get_current_user_id();
 		// /** solo para insert */
 		!($data->id_contenido) ? $contenido->numero_vistas  = 1            : false;
@@ -328,105 +316,104 @@ class ContenidosController extends MasterController {
 		($data->id_contenido) ? $contenido->updated_at = $this->now() 		 : false;
 		($data->id_contenido) ? $contenido->updated_by = $user_id          : false;
 
+		/* GESTION ARCHIVOS  controla los nuevos y los que se deben borrar y actualizar el campo de la tabla */
+		$controlArchivos = (object)[];
+		$controlArchivos->nuevos 	 = [];
+		$controlArchivos->delete	 = [];
+		$controlArchivos->archivos = [];
+		foreach (collect($data->archivos) as $archivo) {
+			/* el objeto archivo: {nombre: , archivo:, accion_archivo: }*/
+			if ($archivo->accion_archivo == 'new') {
+				$objArch 					= (object)[];
+				$objArch->nombre  = str_replace(' ', '_', $archivo->nombre);
+				$nuevoNombre      = /* $objArch->nombre . '__' .*/ $this->funcionesContenidos->codigoUnico() . '.' . pathinfo($archivo->nombre, PATHINFO_EXTENSION);
+				$objArch->archivo = $nuevoNombre;
+
+				$controlArchivos->nuevos[] 	 = $objArch; 
+				$controlArchivos->archivos[] = $objArch;
+			}
+
+			if ($archivo->accion_archivo == 'keep') {
+				$objArch 					= (object)[];
+				$objArch->nombre  = $archivo->nombre;
+				$objArch->archivo = $archivo->archivo;
+
+				$controlArchivos->archivos[] = $objArch; 
+			}
+
+			if($archivo->accion_archivo == 'delete'){
+				$controlArchivos->delete[] = $archivo; 
+			}
+		}
+		$contenido->archivos = count($controlArchivos->archivos) > 0 ? json_encode($controlArchivos->archivos, JSON_UNESCAPED_UNICODE) : '';
+		
+
 		/* GUARDA CONTENIDO */
 		$contenido->id_contenido = $this->guardarObjetoTabla($contenido, 'xfr_contenidos');
 	
 		/* Se obtiene las configuraciones de rutas del parametro del tipo contenido */
 		$paramTipoCont = $this->funcionesContenidos->objTipoContenido($data->tipo_contenido);
-		$directorioDestino = ['imagen' => $paramTipoCont->pathImagenesModulo, 'archivo' => $paramTipoCont->pathArchivosModulo];
+		$directorioDestino = (object)['imagen' => $paramTipoCont->pathImagenesModulo, 'archivo' => $paramTipoCont->pathArchivosModulo];
 
 		$site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
 
-		$respuesta = [];
+		
+		$mensajesMoveFile = [];
+		/*  Este bloque solo correra si se ha cambiado de imagen desde el front, entonces se debe eliminar la imagen anterior */
 		if (!empty($_FILES['imagen'])) {
 			$imagenFile               = $_FILES['imagen'];
-			$archivo = (object)[
-				'nombre'            => $imagenFile['name'],
-				'archivoTemporal'   => $imagenFile['tmp_name'],
-				'directorioDestino' => $directorioDestino['imagen']
-			];
-			// $data->nombre              = $imagenFile['name'];
-			// $data->archivoTemporal     = $imagenFile['tmp_name'];
-			// $data->tipo                = 'imagen';
-			$respuesta[] = $this->moveFile($archivo);
+			$imagenNuevaDestino = $directorioDestino->imagen . $contenido->imagen;
+			$mensajesMoveFile[] = $this->funcionesContenidos->moveFile($imagenFile['tmp_name'], $imagenNuevaDestino );
+
+			/* reduce la dimension de la imagen a small */
+			$nombreImagenSmall =  pathinfo($contenido->imagen, PATHINFO_FILENAME) . '_s.' . pathinfo($contenido->imagen, PATHINFO_EXTENSION);
+			$this->funcionesContenidos->reducirImagen($imagenNuevaDestino, 300, false, $directorioDestino->imagen . $nombreImagenSmall);
+			/* BORRAR IMAGEN ANTIGUA,*/
+			if(isset($contenidoOld) && !empty($contenidoOld->imagen)){
+				$imagenOld = $contenidoOld->imagen;
+				$imagenOld_s =  pathinfo($imagenOld, PATHINFO_FILENAME) . '_s.' . pathinfo($imagenOld, PATHINFO_EXTENSION);
+				$this->funcionesContenidos->deleteFile($directorioDestino->imagen . $imagenOld);
+				$this->funcionesContenidos->deleteFile($directorioDestino->imagen . $imagenOld_s);
+			}
+
 		}
-		if (!empty($_FILES['imagen_s'])) {
-			$imagenFile               = $_FILES['imagen_s'];
-			$extension = pathinfo($imagenFile['name'], PATHINFO_EXTENSION); // Obtener la extensión del archivo
-			$nuevoNombre = pathinfo($imagenFile['name'], PATHINFO_FILENAME) . '_s.' . $extension; // Agregar el sufijo al nombre del archivo
-			$archivo = (object)[
-				'nombre'            => $nuevoNombre,
-				'archivoTemporal'   => $imagenFile['tmp_name'],
-				'directorioDestino' => $directorioDestino['imagen']
-			];
-			// $data->nombre              = $nuevoNombre;
-			// $data->archivoTemporal     = $imagenFile['tmp_name'];
-			// $data->tipo                = 'imagen';
-			$respuesta[] = $this->moveFile($archivo);
-		}
-		if (!empty($_FILES['archivos'])) {
+
+		if (!empty($_FILES['archivos']) && count($controlArchivos->nuevos) > 0 ) {
 			$file  = $_FILES['archivos'];
 			for ($i = 0; $i < count($file['name']); $i++) {
 				$nombreFile = str_replace(' ', '_',  $file['name'][$i]);
 				$archivoNew = collect($controlArchivos->nuevos)->first(function ($item) use ($nombreFile) {
 													return $item->nombre == $nombreFile;
 											});
-				$archivo = (object)[
-					'nombre'            => $archivoNew->archivo,
-					'archivoTemporal'   => $file['tmp_name'][$i],
-					'directorioDestino' => $directorioDestino['archivo']
-				];
-				// $data->nombre              = $archivoNew->archivo;
-				// $data->archivoTemporal     = $file['tmp_name'][$i];
-				// // $data->size             = $imagenFile['size'];
-				// $data->tipo                = 'archivo';
-				$respuesta[] = $this->moveFile($archivo);
-			}
+				$mensajesMoveFile[] = $this->funcionesContenidos->moveFile($file['tmp_name'][$i], $directorioDestino->archivo . $archivoNew->archivo);
+			}			
+		}
+		/* Elimina fisicamente los archivos deseleccionados */
+		if(count($controlArchivos->delete) > 0 ){
+				foreach ($controlArchivos->delete as $item) {
+					$ArchivoDestino = $directorioDestino->archivo . $item->archivo;
+					// $item->directorioDestino = $directorioDestino->archivo;
+					$this->funcionesContenidos->deleteFile($ArchivoDestino);
+				}
 		}
 
 		$errores = 0;
 		$msgErrors = '';
-		foreach ($respuesta as $item) {
-			if($item->status == 'error'){
+		foreach ($mensajesMoveFile as $mensajeMove) {
+			if($mensajeMove->status == 'error'){
 				$errores ++;
-				$msgErrors .= $item->msg . ' ';
+				$msgErrors .= $mensajeMove->msg . ' ';
 			}
 		}
 
 		return [
 			'status' => $errores > 0 ? 'error' : 'ok',
-			'msg'		 => $errores > 0 ? $msgErrors : 'Se subieron todos los archivos'
+			'msg'		 => $errores > 0 ? $msgErrors : 'Se subieron todos los archivos',
+			'time'	 => microtime(true) - $tiempoInicio,
 		];
 	}
 
-	private function moveFile($obj) {
-		// Verificar si se ha subido correctamente el archivo
-		$respuesta = [];
-		if (is_uploaded_file($obj->archivoTemporal)) {
-			// Mover el archivo del directorio temporal al directorio de destino
-			if (move_uploaded_file($obj->archivoTemporal, $obj->directorioDestino . $obj->nombre)) 
-				$respuesta = ['status' => "ok", 'msg' => "{$obj->nombre}, almacenado correctamente."];
-			else 
-				$respuesta = ['status' => "error", 'msg' =>  "{$obj->nombre}, Error al almacenar el archivo."];
-		} 
-		else
-			$respuesta = ['status' => "error", 'msg' => "{$obj->nombre}, Error al subir el archivo."];
-		
-		return (object)$respuesta;
-	}
-
-	private function deleteFile($obj) {
-		// $directorioDestino = ($obj->tipo == 'imagen') ?
-		// 	$obj->paramTipoCont->pathImagenesModulo : $obj->paramTipoCont->pathArchivosModulo;
-		$rutaArchivo = $obj->directorioDestino . $obj->archivo;
-		if (file_exists($rutaArchivo)) {
-			if (unlink($rutaArchivo)) {
-				echo "El archivo se ha eliminado correctamente.";
-			} else {
-				echo "No se pudo eliminar el archivo.";
-			}
-		}
-	}
+	
 
 	
 

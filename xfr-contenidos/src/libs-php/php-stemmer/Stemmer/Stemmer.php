@@ -1,5 +1,5 @@
 <?php
-// namespace Wamania\Snowball\Stemmer;
+namespace Wamania\Snowball\Stemmer;
 
 /**
  * @author Luís Cobucci <lcobucci@gmail.com>

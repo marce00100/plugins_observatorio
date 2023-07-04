@@ -1,7 +1,7 @@
 <?php
+namespace Wamania\Snowball\Stemmer;
 
-require_once $chatbot->path . "fcl-xp-chatbot/files/libs-php/php-stemmer/Stemmer/Stemmer.php";
-// namespace Wamania\Snowball\Stemmer;
+require $xfrContenidos->path . "src/libs-php/php-stemmer/Stemmer/Stemmer.php";
 
 // use voku\helper\UTF8;
 

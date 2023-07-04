@@ -1,5 +1,5 @@
 <?php
-
+require_once $xfrContenidos->path  . "src/libs-php/lib-normaliza.php";
 use frctl\MasterController;
 use FuncionesContenidosController as FuncionesContenidos;
 

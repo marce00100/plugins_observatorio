@@ -56,7 +56,7 @@ function carga_estilosreg() {
   wp_enqueue_script('xyz-functions'
                   , XFL_Core::getUrl() . 'assets/js/xyz-functions.js'
                   , array()
-                  , '1.0.453', false);
+                  , '1.0.454', false);
 }
 
 

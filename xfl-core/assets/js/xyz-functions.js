@@ -10,12 +10,18 @@ jQuery(function($){
     // urlRestApiWP : 'https://www.observatorio.xhr.xof.mybluehost.me/wp-json/' ,
     urlRestApiWP : 'http://localhost/www/wp/observatorio/wp-json/' ,
   
-    showModal: function (modal) {
+    /**
+     * 
+     * @param {modal: contenedor} modal 
+     * @param {closeOnBgClick: true, por defecto} closeOnBgClick 
+     */
+    showModal: function (modal, closeOnBgClick = true) {
       $(".state-error").removeClass("state-error")
       $("#form_cont em").remove();
       $.magnificPopup.open({
         removalDelay: 200, //delay removal by X to allow out-animation,
         focus: '#titulo',
+        closeOnBgClick: closeOnBgClick,
         items: {
           src: modal
         },

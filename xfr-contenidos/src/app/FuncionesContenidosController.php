@@ -68,7 +68,54 @@ class FuncionesContenidosController extends MasterController {
 		return $arry;
 	}
 
-		/** PARA MEDIR TIEMPOS DE CONSULTAS ELIMINAR */
+	public function moveFile($archivoTemporal, $archivoDestino) {
+		// Verificar si se ha subido correctamente el archivo
+		$respuesta = [];
+		if (is_uploaded_file($archivoTemporal)) {
+			// Mover el archivo del directorio temporal al directorio de destino
+			if (move_uploaded_file($archivoTemporal, $archivoDestino)) 
+				$respuesta = ['status' => "ok", 'msg' => "{$archivoDestino}, almacenado correctamente."];
+			else 
+				$respuesta = ['status' => "error", 'msg' =>  "{$archivoDestino}, Error al almacenar el archivo."];
+		} 
+		else
+			$respuesta = ['status' => "error", 'msg' => "{$archivoDestino}, Error al subir el archivo."];
+		
+		return (object)$respuesta;
+	}
+
+	public function deleteFile($archivoDestino) {
+		if (file_exists($archivoDestino)) {
+			if (unlink($archivoDestino)) {
+				echo "El archivo se ha eliminado correctamente.";
+			} else {
+				echo "No se pudo eliminar el archivo.";
+			}
+		}
+	}
+
+	public function reducirImagen($rutaOriginal, $nuevoAncho, $nuevoAlto = false, $rutaNueva, $calidad = 80) {
+    // Obtener las dimensiones originales de la imagen
+    list($anchoOriginal, $altoOriginal) = getimagesize($rutaOriginal);
+		/* Si no se especifica el alto, entonces se reducura proporcionalmente */
+		if(!$nuevoAlto){
+			// Calcular la altura proporcional en base al nuevo ancho
+			$nuevoAlto = round($altoOriginal * ($nuevoAncho / $anchoOriginal));
+		}
+    // Crear una nueva imagen con las dimensiones deseadas
+    $nuevaImagen = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+    // Cargar la imagen original
+    $imagenOriginal = imagecreatefromjpeg($rutaOriginal);
+    // Redimensionar la imagen original a las nuevas dimensiones
+    imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
+    // Guardar la imagen redimensionada en un archivo
+    imagejpeg($nuevaImagen, $rutaNueva, $calidad);
+    // Liberar memoria
+    imagedestroy($nuevaImagen);
+    imagedestroy($imagenOriginal);
+}
+
+/** PARA MEDIR TIEMPOS DE CONSULTAS ELIMINAR */
 	// public function getContents(WP_REST_Request $req) {
 	// 	$DB = $this;
 	// 	$tiempopromedio1 = 0;

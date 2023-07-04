@@ -132,8 +132,8 @@ ob_start();
 					<div class="panel-footer flex wrap justify-evenly">
 						<div __error class="wp100"></div>
 						<!-- CON ICONOS -->
-						<button __cerrar class="btn bg-danger lighter br-a br-dark-light br6 btn-md w150 fs14">Cancelar</button>
-						<button __save type="submit" class="btn btn-primary br-a br-dark-light btn-md br6 w200 fs14">Guardar</button>
+						<button __cerrar class="btn bg-marron--20 br-a br-dark -light br6 btn-md w150 fs14">Cerrar</button>
+						<button __save type="submit" class="btn bg-primary--20 dark br-a br-dark btn-md br6 w200 fs14">Guardar</button>
 					</div>
 				</div>
 				<!-- end: .panel -->
@@ -475,8 +475,11 @@ ob_start();
         },
         getHtmlArchivoItem: (objFile) => {
           return /*html*/`
-                  <div __archivo_item __estado="${objFile.estado}" __archivo_server="${objFile.archivo}" __archivo_nombre="${objFile.nombre}" class="mb5 flex bg-success-80_ p5 br-a br-greyer pl15 br6 justify-between wp80" style="background-color:#e9ffd6">
-                    <span __archivo_nombre >${objFile.nombre}</span>
+                  <div __archivo_item  __accion_archivo="${objFile.accion_archivo}"  __archivo_server="${objFile.archivo}"  __archivo_nombre="${objFile.nombre}" class="mb5 flex bg-success-80_ p5 br-a br-greyer pl15 br6 justify-between wp80" style="background-color: ${objFile.accion_archivo == 'new' ? '#f3ffb7' : '#e9ffd6'} ">
+                    <span __archivo_nombre >
+                      <span>${objFile.nombre}</span>
+                      <span class="ml10 "><a href="${objFile.archivoUrl}" target="_blank" class="text-666  ${objFile.accion_archivo == 'new' ? 'hide' : ''} "><i class="glyphicons glyphicons-eye_open"></i></a></span>
+                    </span>
                     <span __remove_btn class="cursor p5 mr10 fa fa-remove"></span>
                   </div>`;
         },
@@ -491,7 +494,7 @@ ob_start();
               let files = $("[__input_file_archivo]")[0].files;
               for (let i = 0; i < files.length; i++) {
                 let file = files[i];
-                let objFile = { nombre: file.name, archivo: '', estado: 'nuevo' }
+                let objFile = { nombre: file.name, archivo: '', accion_archivo: 'new' }
                 let elemArchivo = $(comps.archivos.getHtmlArchivoItem(objFile));
                 elemArchivo.data('file', file);
                 $('[__archivos]').append(elemArchivo);
@@ -499,7 +502,7 @@ ob_start();
             })
           .on('click', '[__archivos] [__remove_btn]', function () {
               let elemArchivo = $(this).closest('[__archivo_item]');
-              elemArchivo.hide().attr('__estado', 'delete');
+              elemArchivo.hide().attr('__accion_archivo', 'delete');
             });          
         }, 
         create: () => {
@@ -512,7 +515,7 @@ ob_start();
             let objElem = {
               nombre: elemArchivo.attr('__archivo_nombre'),
               archivo: elemArchivo.attr('__archivo_server'),
-              estado: elemArchivo.attr('__estado'),
+              accion_archivo: elemArchivo.attr('__accion_archivo'),
             }
             archivos.push(objElem);
           })
@@ -520,7 +523,7 @@ ob_start();
         },
         set: (archivos) => {
           _.forEach(archivos, (item) => {
-            let objFile = { nombre: item.nombre, archivo: item.archivo, estado: 'server' }
+            let objFile = { nombre: item.nombre, archivo: item.archivo, archivoUrl: item.archivoUrl, accion_archivo: 'keep' }
             let elemArchivo = $(comps.archivos.getHtmlArchivoItem(objFile));
             $('[__archivos]').append(elemArchivo);
           })
@@ -587,11 +590,20 @@ ob_start();
             {
               title: 'Publicación', data: 'fecha_publicacion', orderable: true,
               render: function (data, type, row, meta) {
-                return /*html*/`${row.fecha_publicacion ? moment(row.fecha_publicacion).format('DD/MM/YYYY') : ''}`;
+                return /*html*/`
+                      <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor">
+                        ${row.fecha_publicacion ? moment(row.fecha_publicacion).format('DD/MM/YYYY') : ''}
+                      </div>`;
               }
             },
             {
               title: 'Titulo', data: 'titulo', orderable: false,
+              render: function (data, type, row, meta) {
+                return /*html*/`
+                      <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor">
+                        <b>${row.titulo}</b>
+                      </div>`;
+              }
             },
             {
               title: 'Resumen', data: 'resumen', orderable: false,
@@ -612,7 +624,6 @@ ob_start();
       }
 
     }
-
 
     let funs = {
       /** Inicia el combo con tipos de contenidos  obtiene el dataset del primero*/
@@ -646,7 +657,7 @@ ob_start();
       nuevo: () => {
         $("#modal [__cabecera_modal] span").html(`Crear Contenido`);
         funs.crearFormulario();
-        xyzFuns.showModal(ctxG.modal);
+        xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },
       /** MuestraModal con datos del contenido  */
       editar: (id) => {
@@ -657,7 +668,7 @@ ob_start();
           let data = resp.data;
           funs.setData(data);
           $("#modal [__cabecera_modal] span").html(`Modificar Contenido`);
-          xyzFuns.showModal(ctxG.modal);
+          xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })
       },
@@ -698,7 +709,7 @@ ob_start();
           xyzFuns.alertMsg("[__error]", `Se deben llenar los campos requeridos`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
           return;
         }
-        // funs.spinner();
+        funs.spinner();
         let fields = funs.getData();
         console.log(fields)
 
@@ -711,10 +722,11 @@ ob_start();
             formData.append('imagen_s', $('[__rg_field=imagen]')[0].files[0]);
           }
         }
-        /* para los archivos se carga el formdata */
-        if($("[__archivo_item][__estado=nuevo] ").length > 0){
-          _.forEach($("[__archivo_item][__estado=nuevo] "), (item)=>{
+        /* solo los archivos nuevos ___accion_archivo=new se cargan en el formdata */
+        if($("[__archivo_item][__accion_archivo=new] ").length > 0){
+          _.forEach($("[__archivo_item][__accion_archivo=new] "), (item)=>{
             let elemArchivo = $(item);
+            /* se usa la priopiedad data del elemento ___archivo_item */
             let file = elemArchivo.data('file');
             formData.append('archivos[]', file);
           })
@@ -730,18 +742,17 @@ ob_start();
               if (resp.status == 'error') {
                 xyzFuns.alertMsg("[__error]", `Error: ${resp.msg}`, ' alert-danger br-a br-danger pastel   fs14 p5  mv10', '', '', true);
               }
-              // funs.spinner(false);
             },
             error: function () {
               console.log('Error al subir la image_n.');
-              // funs.spinner(false);
             },
-            complete: function () {
+            complete: function (res) {
+              console.log(res)
               funs.spinner(false);
               if($.fn.DataTable.isDataTable(conT.dt))
                 conT.dt.destroy();
               conT.fillDataT();
-              // xyzFuns.closeModal();
+              xyzFuns.closeModal();
             } 
           })
       },
