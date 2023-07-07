@@ -115,9 +115,9 @@ function get_view_dd_estadistica_admin($datadash) {
 
 <!-- PREFIJO WRAPPER : {frctl: "clase principal" , sta: 'stadistic admin'} -->
 <div class="frctl sta">
-	<div class='ph10 pv20 pw100' >
+	<div class='ph10 pv20 pw100 ' style="min-height: 50vh;" >
 		<!-- =============================== CAMPOS DATASET ================================================= -->
-		<div __section="campos_dataset" class="p15 bg-light dark br6 " style="display: none;">
+		<div __section="campos_dataset" class="p15 bg-light dark br8 br-a br-greyer" style="display: none;">
 			<h4 class="text-center">Selección de los Campos para cargar los sets de datos</h4>
 			<div class="form-horizontal">
 				<div class="form-group fs14">

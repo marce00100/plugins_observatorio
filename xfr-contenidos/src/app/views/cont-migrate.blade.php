@@ -8,8 +8,12 @@ function get_view_contenidos_migrate($xfrContenidos) {
   wp_enqueue_script('moment.min.js'             , $xfrContenidos->core_url . 'assets/libs-ext/moment/min/moment.min.js', array(), null, true);
 
 ob_start(); ?>
+  <div style="min-height: 10vh;"></div>
 
-    <div id="wrap_migrate" class="bg-content frctl">
+  <div id="wrap_migrate" class="bg-content frctl" style="min-height: 70vh;">
+    <div
+      class="bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
+      <h2>Migración Automática</h2>
       <div clasS="mt20 mb20 bg-eee br-a br-greyer br6 p20 flex justify-center wrap font-roboto ">
         <div class="form-group wp40 mr10">
           <label for="sistema" class="form-label">Sistema:</label>
@@ -23,7 +27,8 @@ ob_start(); ?>
           <input id="tipo_contenido" name="tipo_contenido" type="text" __migrate_field="tipo_contenido"
             class="form-control">
           <div class="fs11">
-            <em>OBSERVATORIO: contenidos: noticias, actividades; biblioteca_juridica: normas, jurisprudencias, recomendaciones, jurisprudencia_relevante </em>
+            <em>OBSERVATORIO: contenidos: noticias, actividades; biblioteca_juridica: normas, jurisprudencias,
+              recomendaciones, jurisprudencia_relevante </em>
           </div>
           <div class="fs11">
             <em>MAGISTRATURA: contenidos: noticias, comunicados </em>
@@ -33,20 +38,28 @@ ob_start(); ?>
         <div class="flex justify-around wp100">
           <button __migrate class="btn btn-md bg-primary--40 br-a br-info text-eee">MIGRAR MÓDULO -
             TipoContenido</button>
-          <button __migrate_full class="btn btn-md bg-danger--40 br-a br-greyer text-eee">MIGRAR TODO</button>
+          <button __migrate_full class="btn btn-md bg-danger--40 br-a br-greyer text-eee hide">MIGRAR TODO</button>
         </div>
         <div __migrate_msg class="p10 mt20 hide wp100 text-center"></div>
       </div>
     </div>
+  </div>
 
 <script>
   jQuery(function ($) {     
     let ctxG = {
       rutabase: xyzFuns.urlRestApiWP + 'cont/v1',
       content: '#wrap_migrate',
+      modulos: {
+        magistratura: ['contenidos']
+      }
+      
     }
 
     let funs = {
+      cargarModulos: () => {
+        
+      },
       migrateTables: () => {
         let tipo_contenido = $("[__migrate_field=tipo_contenido]").val();
         $("[__migrate_msg]").addClass("hide");

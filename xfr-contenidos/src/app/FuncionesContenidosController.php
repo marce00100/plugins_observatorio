@@ -21,12 +21,13 @@ class FuncionesContenidosController extends MasterController {
 		$paramTipoCont = $this->getParametro((object)['dominio' => 'tipo_contenido', 'nombre' => $tipo_contenido]);
 		$configTipoCont = json_decode($paramTipoCont->config);
 		
-		$carpetaTipoCont = '';
-		if ($site == 'magistratura') /* Si es de Magistratura solo se tiene la carpeta noticias */
-			$carpetaTipoCont = 'noticias/';
-		else if ($site == 'observatorio') {
-			$carpetaTipoCont = $configTipoCont->directorio ? $configTipoCont->directorio . '/' : ''; 
-		}
+		// $carpetaTipoCont = '';
+		// if ($site == 'magistratura') /* Si es de Magistratura solo se tiene la carpeta noticias */
+		// 	$carpetaTipoCont = 'noticias/';
+		// else if ($site == 'observatorio') {
+		// 	$carpetaTipoCont = $configTipoCont->directorio ? $configTipoCont->directorio . '/' : ''; 
+		// }
+		$carpetaTipoCont = $configTipoCont->directorio ? $configTipoCont->directorio . '/' : ''; 
 		global $xfrContenidos;
 
 		return (object)[
@@ -49,25 +50,7 @@ class FuncionesContenidosController extends MasterController {
     return $contenidoSinTags;
   }
 
-
-	/* de prueba para comparara uuid s*/
-	public function testCripts() {
-		$arry = [];
-		for ($i = 0; $i < 50; $i++) {
-			$arry[] = uniqid('', false);
-		}
-		for ($i = 0; $i < 50; $i++) {
-			$arry[] =  bin2hex(uniqid('', false));
-		}
-		for ($i = 0; $i < 50; $i++) {
-			$arry[] =  bin2hex(random_bytes(16));
-		}
-		for ($i = 0; $i < 50; $i++) {
-			$arry[] = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890'), 0, 16);
-		}
-		return $arry;
-	}
-
+	/** Mueve el archivo subido de la carpeta temporal a un destino */
 	public function moveFile($archivoTemporal, $archivoDestino) {
 		// Verificar si se ha subido correctamente el archivo
 		$respuesta = [];
@@ -94,26 +77,48 @@ class FuncionesContenidosController extends MasterController {
 		}
 	}
 
+	/** Para reducir imagen para hacer mas liviano */
 	public function reducirImagen($rutaOriginal, $nuevoAncho, $nuevoAlto = false, $rutaNueva, $calidad = 80) {
-    // Obtener las dimensiones originales de la imagen
-    list($anchoOriginal, $altoOriginal) = getimagesize($rutaOriginal);
+		// Obtener las dimensiones originales de la imagen
+		list($anchoOriginal, $altoOriginal) = getimagesize($rutaOriginal);
 		/* Si no se especifica el alto, entonces se reducura proporcionalmente */
-		if(!$nuevoAlto){
+		if (!$nuevoAlto) {
 			// Calcular la altura proporcional en base al nuevo ancho
 			$nuevoAlto = round($altoOriginal * ($nuevoAncho / $anchoOriginal));
 		}
-    // Crear una nueva imagen con las dimensiones deseadas
-    $nuevaImagen = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
-    // Cargar la imagen original
-    $imagenOriginal = imagecreatefromjpeg($rutaOriginal);
-    // Redimensionar la imagen original a las nuevas dimensiones
-    imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
-    // Guardar la imagen redimensionada en un archivo
-    imagejpeg($nuevaImagen, $rutaNueva, $calidad);
-    // Liberar memoria
-    imagedestroy($nuevaImagen);
-    imagedestroy($imagenOriginal);
-}
+		// Crear una nueva imagen con las dimensiones deseadas
+		$nuevaImagen = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+		// Cargar la imagen original
+		$imagenOriginal = imagecreatefromjpeg($rutaOriginal);
+		// Redimensionar la imagen original a las nuevas dimensiones
+		imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
+		// Guardar la imagen redimensionada en un archivo
+		imagejpeg($nuevaImagen, $rutaNueva, $calidad);
+		// Liberar memoria
+		imagedestroy($nuevaImagen);
+		imagedestroy($imagenOriginal);
+	}
+
+	
+
+
+	/* de prueba para comparara uuid s*/
+	public function testCripts() {
+		$arry = [];
+		for ($i = 0; $i < 50; $i++) {
+			$arry[] = uniqid('', false);
+		}
+		for ($i = 0; $i < 50; $i++) {
+			$arry[] =  bin2hex(uniqid('', false));
+		}
+		for ($i = 0; $i < 50; $i++) {
+			$arry[] =  bin2hex(random_bytes(16));
+		}
+		for ($i = 0; $i < 50; $i++) {
+			$arry[] = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890'), 0, 16);
+		}
+		return $arry;
+	}
 
 /** PARA MEDIR TIEMPOS DE CONSULTAS ELIMINAR */
 	// public function getContents(WP_REST_Request $req) {

@@ -13,7 +13,7 @@ class DatadashController extends MasterController {
 		$DB = $this;
 		$tabla_vista_name = 'xfr_consolidado_feminicidios';
 		# obtiene los campos de la tabla o vista
-		$tablas = $DB->select("SELECT column_name as nombre_columna  FROM information_schema.columns WHERE 
+		$tablas = $DB->select("SELECT DISTINCT column_name as nombre_columna  FROM information_schema.columns WHERE 
                                     -- table_schema = 'public'  AND 
                                     table_name = '{$tabla_vista_name}' ");
 

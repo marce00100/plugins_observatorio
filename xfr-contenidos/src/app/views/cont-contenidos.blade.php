@@ -22,7 +22,7 @@ ob_start(); ?>
     position: relative;
     background: #FFF;
 		max-width: 860px!important;
-    margin: 40px auto;
+    margin: 80px auto;
     width: 90%!important;
     min-height: 92vh!important;
   }

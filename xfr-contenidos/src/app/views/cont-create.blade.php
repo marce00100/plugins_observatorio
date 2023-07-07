@@ -81,7 +81,7 @@ ob_start();
 					</div>
 					
 					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
-            <div class="panel-heading  bg-dark dark  bg-primary--60_ mb10 p20 br8 br-a br-primary " style="height: auto; line-height: normal;">
+            <div class="panel-heading  bg-primary--60 dark  bg-primary--60_ mb10 p20 br8 br-a br-primary " style="height: auto; line-height: normal;">
 							<div class="text-white-dark mtn mbn fs16 flex align-center justify-evenly wrap gap-10">
 								<i class="fa fa-paperclip fa-lg grow-1"></i> 
                 <span class="ml10 grow-1" __cabecera_dt>Tipo Contenido </span>
@@ -108,7 +108,7 @@ ob_start();
 			<div id="modal" class="frctl white-popup-block popup-basic mfp-with-anim mfp-hide">
 				<div class="panel">
 					<!-- panel heading -->
-					<div class="bg-primary--20 _text-333 flex align-center p15 ">
+					<div class="bg-primary--20 bg-theme1--40_ _text-333 flex align-center p15 ">
 						<i class="fa fa-paperclip fa-lg ml10"></i>
 						<h2 class="panel-title ml10" __cabecera_modal><span>__</span></h2>
             <span class="close btnCloseModal"><i class="glyphicons glyphicons-remove_2"></i></span>
@@ -644,7 +644,7 @@ ob_start();
           let optsTipoContenido = xyzFuns.generaOpciones(res.data, 'nombre', 'descripcion');
           $("[__tipo_contenido]").html(optsTipoContenido);
 
-          $("[__tipo_contenido] option")[4].selected = true; 
+          $("[__tipo_contenido] option")[0].selected = true; 
           ctxG.tipo_contenido = $("[__tipo_contenido]").val();
           ctxG.paramsTiposCont = res.data;
           conT.fillDataT();

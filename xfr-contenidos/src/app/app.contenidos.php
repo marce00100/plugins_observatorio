@@ -1,19 +1,25 @@
 <?php
 /** Comentar para LARAVEL , descomentar cuando controller y routes del plug */
 require_once $xfrContenidos->path . "src/app/FuncionesContenidosController.php"; 
-require_once $xfrContenidos->path . "src/app/ContenidosController.php"; 
-require_once $xfrContenidos->path . "src/app/ContenidosBJController.php"; 
-require_once $xfrContenidos->path . "src/app/ContenidosMigrateController.php"; 
-require_once $xfrContenidos->path . "src/app/contenidos.routes.php";
+require_once $xfrContenidos->path . "src/app/ContController.php"; 
+require_once $xfrContenidos->path . "src/app/ContBJController.php"; 
+require_once $xfrContenidos->path . "src/app/CreaNormasController.php"; 
+
+require_once $xfrContenidos->path . "src/app/ContMigrateController.php"; 
+
+require_once $xfrContenidos->path . "src/app/cont.routes.php";
 
 /** Se cargan los archivos de los shortcodes y sus vistas  */
 require_once $xfrContenidos->path . "src/app/views/cont-contenidos.blade.php";
 require_once $xfrContenidos->path . "src/app/views/cont-biblioteca-juridica.blade.php";
 require_once $xfrContenidos->path . "src/app/views/cont-sentencias.blade.php";
+
 require_once $xfrContenidos->path . "src/app/views/cont-create.blade.php";
+require_once $xfrContenidos->path . "src/app/views/crea-normas.blade.php";
+
 require_once $xfrContenidos->path . "src/app/views/cont-migrate.blade.php";
 
-require_once $xfrContenidos->path . "src/app/contenidos.shortcodes.php";
+require_once $xfrContenidos->path . "src/app/cont.shortcodes.php";
 
 /** Se cargan funciones adicionales  */
 

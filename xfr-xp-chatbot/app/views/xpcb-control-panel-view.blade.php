@@ -10,9 +10,17 @@ ob_start(); ?>
 
 <div id="xp_controlpanel" class="frctl">
 	<!-- ------------- AGENTE CHATBOT -------------------------------------------->
-	<div id=xp_agente __xpcp_section=acciones class="xp-cp-agente">
-		<div class="bg-light darker mb10 p10">
-			<button __xpcp_accion="entrenar" class="btn btn-info"> Entrenar <i class="fab fa-think-peaks"></i></button>
+	<div id=xp_agente __xpcp_section=acciones class="xp-cp-agente" style="width: 60%; margin: 60px auto; min-height: 70vh;">
+
+		<div class="bg-light darker mb10 p10 br-a br-greyer br8 fs14 text-center">
+			<div>
+				<h3>Entrenamiento del chatbot</h3>
+				<h4>Se realizará la tokenización de la información (este proceso puede tardar varios minutos)</h4>
+				<span>
+					Aseguresé de haber cargado la base de datos, en la tabla xfr_textos, el excel que contiene la información para el chatbot.
+				</span>
+			</div>
+			<div><button __xpcp_accion="entrenar" class="btn btn-info br6 mt20"> Entrenar <i class="fab fa-think-peaks"></i></button></div>
 		</div>
 	</div>
 </div>
