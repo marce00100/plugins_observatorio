@@ -19,7 +19,7 @@ ob_start(); ?>
           <label for="sistema" class="form-label">Sistema:</label>
           <select id="sistema" name="sistema" __migrate_field="sistema" class="form-control">
             <option value="observatorio">observatorio</option>
-            <option value="magistratura">magistratura</option>
+            <!-- <option value="magistratura">magistratura</option> -->
           </select>
         </div>
         <div class="form-group wp40">

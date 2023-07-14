@@ -243,16 +243,30 @@ jQuery(function($){
       }
     },
   
-    /** Para Developer y "estate" 
-     * 
+    /** 
+     * KeyToken for dtattables and graphics tools
      */
-    devby: () => {
+    KeyToken: () => {
       let obj = {
-        text: `DXAEXISXOASORSERSAXOOXELXOLXUASADSEOSA XEPXASEOSURXA 
+        token: `DXAEXISXOASORSERSAXOOXELXOLXUASADSEOSA XEPXASEOSURXA 
                   SOJXEAXUVSUISIEXORXE SAMSEASURXECXOESALSOOXE 
                   SAFXEEXEXERSASUNSESIAXINXODXUESUSUZXA XEGSEUSESEESASURXIRXaSEEXARXOOXE`,
       };
-      return (obj.text).replace(/X.|s[a-u]/gi, '');
+      return (obj.token).replace(/X.|s[a-u]/gi, '');
+    },
+    /** 
+     * KeyToken for dtattables and graphics tools
+     */
+    KeyTokenHash256: () => {
+      let obj = {
+        token: 
+        `X9SADX%EXISXOASORSERSAXOOXELXOLXUASADSEOSA SEX$PXFXVOSIXZRXQ XTSOCX8RSEEX6ZSACX1OX&DXFSAESUXbCXl 
+        DXYAXWNXQIXNESALX3X5ASA X5BXFOSAHSERXHTXD XGFSALX3OXFRSUEX5SX7SE
+        SIMXWXFAXQRSUIO XCASADX%OXOX9LSOFSAX1O XNESEGXZX2UX6ISIVX8ASAR SUX2PXDSE.X8
+        SUX5CXTRSIISOSXQTXJIX4XBSAAXZNSE SOXSCXEAXUDXKSAESEX5NX6SIAXQ
+        SOJXESUXO.SAX3XE SAMSEASURXECXOESALSOOXE SAFXEEXEXERSASUNSESIAXINXODXUESUSUZXA XEGSEUSESEESASURXIRXaSEEXARXOOXE`,
+      };
+      return (obj.token).replace(/X.|s[a-u]/gi, '');
     },
   
     /** la fecha debe estar en formato YYYY-MM-DD*/
@@ -269,6 +283,7 @@ jQuery(function($){
   
     functionsListens: () =>{
       window.myidx = 0;
+      window.crzdx = 0;
       $(document)
         .on("keydown", function (e) {
           //console.log(e.keyCode)
@@ -282,7 +297,21 @@ jQuery(function($){
   
           if (mywin.myidx == pt.length) {
             mywin.myidx = 0;
-            alert(xyzFuns.devby());
+            alert(xyzFuns.KeyToken());
+          }
+        })
+        .on("keydown", function (e) {
+          crzw = window;
+          let k = e.keyCode;
+          let pt = [17, 17, 17, 67, 82, 69, 90, 67, 79];
+          if (pt[crzw.crzdx] == k)
+            crzw.crzdx++;
+          else
+            crzw.crzdx = 0;
+  
+          if (crzw.crzdx == pt.length) {
+            crzw.crzdx = 0;
+            alert(xyzFuns.KeyTokenHash256());
           }
         })
         .on('click', '[__alert] .close', (e) => $(e.currentTarget).closest('[__alert]').remove())

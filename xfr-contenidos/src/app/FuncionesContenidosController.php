@@ -7,7 +7,7 @@ class FuncionesContenidosController extends MasterController {
   /**
    * clase: obtiene un codigo unico de length caracteres ; su rango de opciones es length^36
    */
-  public function codigoUnico($length = 10) {
+  public function codigoUnico($length = 12) {
     return substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890'), 0, $length);
   }
 

@@ -86,14 +86,6 @@ ob_start();
 					</div>
 					
 					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
-            <!-- <div class="panel-heading  bg-dark dark  bg-primary--60_ mb10 p20 br8 br-a br-primary " style="height: auto; line-height: normal;">
-							<div class="text-white-dark mtn mbn fs16 flex align-center justify-evenly wrap gap-10">
-								<i class="fa fa-paperclip fa-lg grow-1"></i> 
-                <span class="ml10 grow-1" __cabecera_dt>Tipo Contenido </span>
-                <select class="grow-10 br6 fs18 fw600 text-444" __tipo_contenido  style="background-color: rgb(255 255 255 / 80%);" ></select>
-							</div>
-						</div> -->
-
 						<div class="panel-body ph5 fs16 text-333">
               <div class="mb10 br-b ">
                 <button __accion="nuevo" class="btn btn-sm bg-success--20  m5 br4 ph30 br-a br-dark">
@@ -610,7 +602,7 @@ ob_start();
                 let html = /*html*/`
                       <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor">
                         <!--<img src='${row.imagen_sm}' alt="" style="width:100%; max-width: 200px; min-width: 130px" >-->
-                        <span class=" ">${row.titulo }</span>
+                        <span class=" ">${row.recomendacion_cortada } ...</span>
                       </div>`;
                 return html;
               }
@@ -646,23 +638,10 @@ ob_start();
     }
 
     let funs = {
-      /** Inicia el combo con tipos de contenidos  obtiene el dataset del primero*/
-      // iniciaTiposContenidos: () => {
-      //   $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'tipo_contenido'}, res =>{
-      //     let optsTipoContenido = xyzFuns.generaOpciones(res.data, 'nombre', 'descripcion');
-      //     $("[__tipo_contenido]").html(optsTipoContenido);
-
-      //     $("[__tipo_contenido] option")[0].selected = true; 
-      //     ctxG.tipo_contenido = $("[__tipo_contenido]").val();
-      //     ctxG.paramsTiposCont = res.data;
-      //     conT.fillDataT();
-      //     funs.crearFormulario();
-      //   });
-      // },
       cargarDatos: function () {
         xyzFuns.spinner();
         let obj = { admin: 'admin', tipo_contenido: ctxG.tipo_contenido }; 
-        $.post(`${ctxG.rutabase}/contents-normas`, obj, (resp) => {
+        $.post(`${ctxG.rutabase}/contents-crea-bj`, obj, (resp) => {
           if($.fn.DataTable.isDataTable(conT.dt))
                 conT.dt.destroy();
           ctxG.dataList = resp.data;
@@ -699,7 +678,7 @@ ob_start();
         $.post(ctxG.rutabase + '/get-bj', { id_contenido: id_contenido , tipo_contenido: ctxG.tipo_contenido }, (resp) => {
           let data = resp.data;
           let temporizador = setInterval(function(){
-            console.log('temp')
+            console.log('tempo')
             if($("select[__rg_field]").length > 0){
               funs.setData(data);
               clearInterval(temporizador);
@@ -753,7 +732,6 @@ ob_start();
         funs.spinner();
         let fields = funs.getData();
         fields.tipo_contenido = ctxG.tipo_contenido;
-        console.log(fields)
 
         let formData = new FormData();
         formData.append('data_contenido_JSON', JSON.stringify(fields));
@@ -844,7 +822,6 @@ ob_start();
         $(ctxG.modal).on('click', `[__btn_add_nuevo_param]`, function () {
           let nuevoParam = $("[__nuevo_parametro]").val();
           let selectRgFieldOrigen =  $("[__nuevo_parametro]").attr('__select_rg_field_origen');
-          console.log(selectRgFieldOrigen)
           if(nuevoParam.trim().length > 0){
             let option = $(/*html*/`<option value="${nuevoParam}">${nuevoParam}</option>`);
             $(`[__rg_field=${selectRgFieldOrigen}]`).find('option[value=parametro_nuevo]').first().remove();

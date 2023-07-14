@@ -1,6 +1,7 @@
 <?php
 require_once $xfrContenidos->path  . "src/libs-php/lib-normaliza.php";
 use frctl\MasterController;
+use frctl\Normaliza;
 use FuncionesContenidosController as FuncionesContenidos;
 
 
@@ -84,50 +85,8 @@ class ContMigrateController extends MasterController {
     ];
   }
 
-  private function migra($sistema, $tipo_contenido){
+  private function migra($sistema, $tipo_contenido) {
     $DB = $this;
-
-    /**
-     * ------------------------------------------------------------------------
-     * BD: MAGISTRATURA ; MODULO: NOTICIAS
-     * ------------------------------------------------------------------------
-     */
-    if ($sistema == 'magistratura' && $tipo_contenido == 'noticias') {      
-      $tabla_target = 'xfr_contenidos';
-      /* se eliminann noticias y comunicados */
-      $DB->statement(
-        "DELETE FROM {$tabla_target} WHERE tipo_contenido like '%noticias%' or tipo_contenido like '%comunicados%' ");
-
-      $DB->statement(
-        /* Realiza el inser de loscampos principales */
-        "INSERT INTO {$tabla_target} (tipo_contenido, fecha_publicacion, titulo, contenido, estado_contenido, numero_vistas, created_at ) 
-        SELECT g.title as categoria, c.publish_up as fecha_publicacion, c.title as titulo, c.introtext as contenido, 1, c.hits, c.created
-        FROM xat65_content c, xat65_categories g
-        WHERE c.catid= g.id and g.title like '%noti%' and c.state = 1
-        order by publish_up asc " );
-
-      /* Quita una publicidad existente */
-      $DB->statement("UPDATE {$tabla_target} set contenido = replace(contenido, '</p><span style=\"position: absolute;left: -43123px;\">Jackpot City casino <a href = \"https://slots-online-canada.ca/review/jackpot-city-casino/\">jackpot-city-casino</a> is one of the best online casinos out there.</span>', '') ");
-
-      $list = collect($DB->select("SELECT * FROM {$tabla_target}"));
-      foreach ($list as $item) {
-        /* Quita los htmls y caracteres especiales convitirndo a UTF8 */
-        $item->texto     = html_entity_decode($this->funcionesContenidos->quitarHtmlTags($item->contenido), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $item->tipo_contenido = strtolower(substr($item->titulo, 0, 8)) == 'comunica' ? 'comunicados' : 'noticias';
-        $item->updated_at     = $this->now();
-
-        try {
-          $this->guardarObjetoTabla($item, $tabla_target);
-        } catch (Exception $e) {
-          return (object)['status' => 'error', 'msg' => 'Error' . $e->getMessage()];
-        }
-      }
-      return (object)[
-        'status'              => 'ok',
-        'msg'                 => 'Se guardaron ' . count($list),
-        'registros_afectados' =>  count($list)
-      ];      
-    }
 
     /**
      * ------------------------------------------------------------------------
@@ -169,6 +128,10 @@ class ContMigrateController extends MasterController {
         $cont->imagen            = $item->imagen;
         $cont->orden             = 1;
         $cont->estado_contenido  = 1;
+
+        $cont->titulo_token   = Normaliza::lematizaConStemSW($cont->titulo);
+        $cont->resumen_token  = Normaliza::lematizaConStemSW($cont->resumen);
+        $cont->texto_token    = Normaliza::lematizaConStemSW($cont->texto);
 
         /** Al codificar a formato json con la opcon JSON_ENESCAPED_UNICODE se escapan los caracteres especiales y no son transformados al tipo \u00e1 que es á */
         $cont->campos_extra      = ($tipo_contenido == 'noticias') ? 
@@ -256,9 +219,9 @@ class ContMigrateController extends MasterController {
         $DB->statement(" UPDATE {$config->tabla} t set t.cod_tema     = ( select p.id from xfr_parametros p where p.dominio = 'temas' and p.temp = t.cod_tema )");
         $DB->statement(" UPDATE {$config->tabla} t set t.cod_subtema  = ( select p.id from xfr_parametros p where p.dominio = 'subtemas' and p.temp = t.cod_subtema )");
       }
-      
+
       /* categorias  */
-      if($tipo_contenido == 'normas' || $tipo_contenido == 'jurisprudencia'){
+      if ($tipo_contenido == 'normas' || $tipo_contenido == 'jurisprudencia') {
         $DB->statement(" UPDATE {$config->tabla} t set t.categoria    = ( select p.id from xfr_parametros p where p.dominio = '{$paramCategoria}' and p.temp = t.categoria)");
         if($tipo_contenido == 'jurisprudencia'){
           // update jurisprudencias set categoria = 72 where categoria = ''
@@ -308,6 +271,17 @@ class ContMigrateController extends MasterController {
         $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN sistema idp_sistema INT ");          
         $DB->statement(" UPDATE {$config->tabla} t set t.tribunal = (SELECT p.id FROM xfr_parametros p WHERE p.dominio like '%tribunales%' AND p.nombre = t.tribunal)");
         $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN tribunal idp_tribunal INT ");          
+
+      }
+
+      if($tipo_contenido == 'jurisprudencia_relevante'){
+        $DB->statement(" ALTER TABLE  {$config->tabla} CHANGE COLUMN cod_sentencia id INT AUTO_INCREMENT PRIMARY KEY");
+        $DB->statement(" ALTER TABLE  {$config->tabla} MODIFY  sentencia MEDIUMTEXT");
+        $DB->statement(" ALTER TABLE  {$config->tabla} MODIFY  razonamiento MEDIUMTEXT");
+        $DB->statement(" ALTER TABLE  {$config->tabla} MODIFY  decision MEDIUMTEXT");
+
+        $DB->statement(" UPDATE {$config->tabla} t set t.categoria = (SELECT p.id FROM xfr_parametros p WHERE p.dominio like '%tribunales%' AND p.nombre = t.categoria)");
+        $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN categoria idp_tribunal INT ");          
 
       }
 

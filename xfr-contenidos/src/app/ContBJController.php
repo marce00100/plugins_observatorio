@@ -46,26 +46,21 @@ class ContBJController extends ContController { //MasterController {
 
 				/** se colocan las que son columnas propias  */
 				$columnasPropias = ($biblioteca == 'normas') ?
-				" aa.id as id_biblioteca, aa.titulo as titulo, aa.tipo " :
-				" aa.id as id_biblioteca, aa.identificador as titulo, 
-									ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
+				" aa.titulo as titulo, aa.tipo " :
+				" aa.identificador as titulo, 
+									ptribunal.descripcion as nombre_tribunal, ptribunal.orden as orden_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
 
 				$leftJoinCondition = ($biblioteca == 'normas') ?
-				" LEFT JOIN archivos a on a.modulo = 'normativa' 			and a.cod_modulo = aa.id " :
-				" LEFT JOIN archivos a on a.modulo = 'jurisprudencia' and a.cod_modulo = aa.id 
-						LEFT JOIN xfr_parametros ptribunal on aa.idp_tribunal = ptribunal.id ";
+				" " :
+				" LEFT JOIN xfr_parametros ptribunal on aa.idp_tribunal = ptribunal.id ";
 
-				$orderBy = ($biblioteca == 'normas') ?								
-					" {$categoriaConfig->orden}, orden_propio " :
-					// " nombre_pais, psistema.orden, tema, subtema, aa.orden " :
-					" ptribunal.orden, nombre_pais, psistema.orden, tema, subtema, aa.orden ";
 
 				$query =
 					"SELECT /* pcategoria.nombre as categoria, pcategoria.orden as orden_categoria,*/  
-					ptema.nombre as tema, ptema.orden as orden_tema, psubtema.nombre as subtema, psubtema.orden as orden_subtema,
+					aa.id as id_biblioteca, ptema.descripcion as tema, ptema.orden as orden_tema, psubtema.descripcion as subtema, psubtema.orden as orden_subtema,
 					p.pais as nombre_pais, concat(p.sigla,'-',p.pais) as imagen_nombre_pais, 
-						psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, psistema.orden as orden_sistema, aa.orden, GROUP_CONCAT(a.nombre_archivo) as archivos, 
-						aa.orden as orden_propio, {$columnasPropias}
+						psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, psistema.orden as orden_sistema, 
+						aa.orden as orden_propio, aa.archivos, {$columnasPropias}
 					FROM {$bibliotecaConfig->tabla} aa 
 					LEFT JOIN xfr_parametros pcategoria on aa.idp_categoria = pcategoria.id
 					LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
@@ -75,9 +70,7 @@ class ContBJController extends ContController { //MasterController {
 					{$leftJoinCondition}
 
 					WHERE 1 = 1 AND aa.estado = 1  AND pcategoria.nombre like '{$categoria}' 
-					GROUP BY /* categoria, orden_categoria,*/ 
-					tema, subtema, nombre_pais, imagen_nombre_pais, nombre_sistema, orden, id_biblioteca									
-					ORDER BY {$orderBy}"; // nombre_pais, nombre_sistema desc, tema, subtema, {$orderBy}";
+					ORDER BY {$categoriaConfig->orden}, orden_propio "; 
 
 				/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
 				$data = collect($DB->select($query));
@@ -115,22 +108,19 @@ class ContBJController extends ContController { //MasterController {
 				$categoria = $cat->nombre;
 				$categoriaConfig =  json_decode($this->getParametro((object)['dominio' => "categoria_{$biblioteca}", 'nombre' => $categoria])->config);
 				
-				// $leftJoinArchivosContition = " LEFT JOIN archivos a on a.modulo = 'recomendacion' and a.cod_modulo = aa.cod_recomendacion ";
-				// $columnasPropias = " aa.cod_sentencia as id_biblioteca, aa.recomendacion as texto, comite, anio ";
-				$orderBy = " orden_tribunal, fecha desc, orden_jurisprudencia_relevante ";
 				$query =
-					"SELECT aa.cod_sentencia as id_biblioteca, 
-					ptribunal.descripcion as nombre_tribunal, concat(aa.categoria,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal,
+					"SELECT aa.id as id_biblioteca, 
+					ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal,
 					tema as titulo, resumen, fecha, nr_sentencia as nro_sentencia, 
 					/* sentencia, razonamiento, desicion, */
-					imagen, archivos, aa.orden as orden_jurisprudencia_relevante
+					imagen, archivos, aa.orden as orden_propio
 					, CASE WHEN (imagen IS NOT NULL AND imagen != '') THEN  CONCAT(SUBSTRING_INDEX(imagen, '.', 1), '_s.', SUBSTRING_INDEX(imagen, '.', -1)) 
 						ELSE '' END AS imagen_sm
 						
 					FROM {$bibliotecaConfig->tabla} aa 
-					LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.categoria like ptribunal.nombre 
+					LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.idp_tribunal like ptribunal.id 
 					WHERE 1 = 1
-					ORDER BY {$orderBy} ";
+					ORDER BY {$categoriaConfig->orden}, orden_propio  ";
 
 				$lista_contenidos = collect($DB->select($query));
 				global $xfrContenidos;
@@ -138,11 +128,6 @@ class ContBJController extends ContController { //MasterController {
 				$configsTipoCont = $this->objTipoContenido($biblioteca);
 
 				foreach ($lista_contenidos as $contenido) {
-					// if(!$contenido->resumen || trim($contenido->resumen) == ''){
-					// 	$contenidoSinTags = preg_replace('/<w[^>]*>[^>]*<\/w[^>]*>|<xml>[^>]*<\/xml>|<style>[^>]*<\/style>|<[^>]*>/', '', $contenido->contenido);
-					// 	// $contenidoSinTags = preg_replace('/\s|\n|\r|\t/', '', $contenidoSinTags);
-					// 	$contenido->resumen = substr(trim($contenidoSinTags), 0, 150);
-					// }
 					$contenido->resumen = substr(trim($contenido->resumen), 0, 150);
 		
 					/* si imagen_sm */
@@ -195,23 +180,15 @@ class ContBJController extends ContController { //MasterController {
 				$categoria = $cat->nombre;
 				$categoriaConfig =  json_decode($this->getParametro((object)['dominio' => "categoria_{$biblioteca}", 'nombre' => $categoria])->config);
 				
-				$columnasPropias = " aa.cod_recomendacion as id_biblioteca, aa.recomendacion as texto, comite, anio ";
-				$leftJoinContition = " LEFT JOIN archivos a on a.modulo = 'recomendacion' and a.cod_modulo = aa.cod_recomendacion ";
-
 				$query =
-					"SELECT pt.nombre as tema, pst.nombre as subtema, 
-						aa.orden, GROUP_CONCAT(a.nombre_archivo) as archivos, {$columnasPropias}
+					"SELECT aa.id as id_biblioteca, ptema.descripcion as tema, ptema.orden as orden_tema, psubtema.descripcion as subtema, 
+						aa.orden as orden_propio, aa.archivos,  aa.recomendacion as texto, pcomite.descripcion as comite, anio 
 					FROM {$bibliotecaConfig->tabla} aa 
-					-- left join xfr_parametros pcategoria on aa.categoria = pcategoria.id
-					LEFT JOIN xfr_parametros pt on aa.cod_tema = pt.id
-					LEFT JOIN xfr_parametros pst on aa.cod_subtema = pst.id and pst.id_padre = pt.id
-					-- LEFT JOIN  paises p on aa.cod_pais = p.cod_pais
-					{$leftJoinContition}
-
-					LEFT JOIN comites com on aa.cod_comite = com.cod_comite
+					LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
+					LEFT JOIN xfr_parametros psubtema on aa.idp_subtema = psubtema.id 
+					LEFT JOIN xfr_parametros pcomite on aa.idp_comite = pcomite.id
 					WHERE 1 = 1
-					GROUP BY tema, subtema, orden, id_biblioteca
-					ORDER BY comite, tema, subtema, aa.orden";
+					ORDER BY {$categoriaConfig->orden}, orden_propio "; 
 
 				$data = collect($DB->select($query));
 				/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
@@ -232,9 +209,7 @@ class ContBJController extends ContController { //MasterController {
 				'status'        => 'ok',
 				'time'	        => microtime(true) - $tiempoInicio,
 			];
-
 		}
-
 	}
 
 	/**
@@ -260,9 +235,8 @@ class ContBJController extends ContController { //MasterController {
 		if ($biblioteca == 'normas' || $biblioteca == 'jurisprudencia') {
 
 			$leftJoinContition = ($biblioteca == 'normas') ?
-			" LEFT JOIN archivos a on a.modulo = 'normativa' 			and a.cod_modulo = aa.id " :
-			" LEFT JOIN archivos a on a.modulo = 'jurisprudencia' and a.cod_modulo = aa.id 
-				LEFT JOIN xfr_parametros ptribunal on aa.idp_tribunal = ptribunal.id ";
+			" " :
+			"	LEFT JOIN xfr_parametros ptribunal on aa.idp_tribunal = ptribunal.id ";
 		
 			$columnasPropias = ($biblioteca == 'normas') ?
 				" aa.id as id_biblioteca, aa.titulo as titulo, aa.resumen, aa.tipo, aa.texto, aa.fecha, aa.pagina " :
@@ -273,7 +247,7 @@ class ContBJController extends ContController { //MasterController {
 			$query =
 				"SELECT pcategoria.nombre as categoria, pcategoria.descripcion as categoria_descripcion, ptema.descripcion as tema, psubtema.descripcion as subtema, 
 					p.pais as nombre_pais, concat(p.sigla,'-',p.pais) as imagen_nombre_pais, 
-					psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, GROUP_CONCAT(a.nombre_archivo) as archivos, {$columnasPropias}
+					psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, aa.archivos, {$columnasPropias}
 				FROM {$bibliotecaConfig->tabla} aa 
 				LEFT JOIN xfr_parametros pcategoria on aa.idp_categoria = pcategoria.id
 				LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
@@ -282,9 +256,7 @@ class ContBJController extends ContController { //MasterController {
 				LEFT JOIN  paises p on aa.cod_pais = p.cod_pais
 				{$leftJoinContition}
 		
-				WHERE 1 = 1 and aa.id = {$id_biblioteca}
-				GROUP BY categoria, tema, subtema, pais, sigla, id_biblioteca
-				";
+				WHERE 1 = 1 and aa.id = {$id_biblioteca} ";
 
 			$data = collect($DB->select($query))->first();
 
@@ -299,16 +271,15 @@ class ContBJController extends ContController { //MasterController {
 
 		if ($biblioteca == 'jurisprudencia_relevante') {
 
-			$whereCondition = " and cod_sentencia = {$id_biblioteca} ";	
 			$query =
-				"SELECT aa.cod_sentencia as id_biblioteca, 
-				ptribunal.descripcion as nombre_tribunal, concat(aa.categoria,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal,
+				"SELECT aa.id as id_biblioteca, 
+				ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal,
 				tema as titulo, resumen, fecha, nr_sentencia as nro_sentencia, 
 				sentencia, razonamiento, decision, 
-				imagen, archivos, aa.orden as orden_jurisprudencia_relevante					
+				imagen, archivos			
 				FROM {$bibliotecaConfig->tabla} aa 
-				LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.categoria like ptribunal.nombre 
-				WHERE 1 = 1  {$whereCondition}
+				LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.idp_tribunal like ptribunal.id 
+				WHERE 1 = 1 and aa.id = {$id_biblioteca} 
 				";
 
 			$data = collect($DB->select($query))->first();

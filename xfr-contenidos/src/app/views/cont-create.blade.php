@@ -737,7 +737,7 @@ ob_start();
         if($('[__rg_field=imagen]').attr('__imagen_nueva') != '' ) {
           if ($('[__rg_field=imagen]')[0].files.length > 0) {
             formData.append('imagen', $('[__rg_field=imagen]')[0].files[0]);
-            formData.append('imagen_s', $('[__rg_field=imagen]')[0].files[0]);
+            // formData.append('imagen_s', $('[__rg_field=imagen]')[0].files[0]);
           }
         }
         /* solo los archivos nuevos ___accion_archivo=new se cargan en el formdata */

@@ -1,14 +1,14 @@
 <?php
 use frctl\MasterController;
 
-class CreaNormasController extends ContController { //MasterController {
+class CreaBJController extends ContController { //MasterController {
 	
 
 	/** 
 	 * POST CONTENIDOS TIPO_CONTENIDO de la Bilbioteca Juridica
 	 * {tipo_contenido:tipo_contenido}
 	 */
-	public function contentsNormas(WP_REST_Request $req){
+	public function contentsBJ(WP_REST_Request $req){
 		$tiempoInicio = microtime(true);
 		/* Quitar si no es WP */
 		$site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
@@ -96,55 +96,47 @@ class CreaNormasController extends ContController { //MasterController {
 
 		 /* eliminar este bloque */
 		if ( $tipoContBiblioteca == 'jurisprudencia_relevante') {
-			$categorias = $this->parametrosFrom((object)["dominio" => "categoria_jurisprudencia"]);
+			$categorias = $this->parametrosFrom((object)["dominio" => "categoria_jurisprudencia_relevante"]);
 			$tribunales = $this->parametrosFrom((object)["dominio" => "tribunales"]);
-			$sistemas 	= $this->parametrosFrom((object)["dominio" => "sistemas"]);
 
-			$resultado = (object)[];
-
-			/** se colocan las que son columnas propias  */
-			$columnasPropias = ($tipoContBiblioteca == 'normas') ?
-					" aa.id as id_contenido, aa.titulo as titulo, aa.tipo "
-					:	" aa.id as id_contenido, aa.identificador as titulo, 
-											ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
-
-			$leftJoinCondition = ($tipoContBiblioteca == 'normas') ?
-					" LEFT JOIN archivos a on a.modulo = 'normativa' 			and a.cod_modulo = aa.id "
-					:	" LEFT JOIN archivos a on a.modulo = 'jurisprudencia' and a.cod_modulo = aa.id 
-								LEFT JOIN xfr_parametros ptribunal on ptribunal.id = aa.idp_tribunal ";
-
-			$orderBy = ($tipoContBiblioteca == 'normas') ?
-					" categoria, nombre_pais, psistema.orden, tema, subtema, aa.orden " 
-					: " categoria, ptribunal.orden, nombre_pais, psistema.orden, tema, subtema, aa.orden ";
-
+			$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
 			$query =
-				"SELECT pcategoria.descripcion as nombre_categoria, pcategoria.orden as orden_categoria,
-						ptema.nombre as tema, ptema.orden as orden_tema, psubtema.nombre as subtema, psubtema.orden as orden_subtema,
-						p.pais as nombre_pais, concat(p.sigla,'-',p.pais) as imagen_nombre_pais, 
-						psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, psistema.orden as orden_sistema, aa.orden
-						-- , GROUP_CONCAT(a.nombre_archivo) as archivos
-						, aa.orden as orden_propio, aa.estado as estado_biblioteca, {$columnasPropias}
+				"SELECT  aa.id as id_contenido, 
+						ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal, imagen,
+						tema as titulo, fecha, nr_sentencia
+						, aa.orden as orden_propio, aa.estado as estado_biblioteca
+						, CASE WHEN (imagen IS NOT NULL AND imagen != '') THEN  CONCAT(SUBSTRING_INDEX(imagen, '.', 1), '_s.', SUBSTRING_INDEX(imagen, '.', -1)) 
+						ELSE '' END AS imagen_sm
 					FROM {$tipoContConfigs->config->tabla} aa 
-					LEFT JOIN xfr_parametros pcategoria on aa.idp_categoria = pcategoria.id
-					LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
-					LEFT JOIN xfr_parametros psubtema on aa.idp_subtema = psubtema.id 
-					LEFT JOIN xfr_parametros psistema on aa.idp_sistema = psistema.id
-					LEFT JOIN  paises p on aa.cod_pais = p.cod_pais
-					{$leftJoinCondition}
-					/* la linea anterior equivale a left join archivos a on a.modulo = normativa_o_jurisprudencia and a.cod_modulo = aa.id__o__id */
-					WHERE 1 = 1 
-					-- GROUP BY /* categoria, orden_categoria,*/ 
-					-- tema, subtema, nombre_pais, imagen_nombre_pais, nombre_sistema, orden, id_contenido									
+					LEFT JOIN xfr_parametros ptribunal on ptribunal.id = aa.idp_tribunal
+					WHERE 1 = 1 								
 					ORDER BY tema"; // nombre_pais, nombre_sistema desc, tema, subtema, {$orderBy}";
 
 			/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
 			$data = collect($DB->select($query));
-
+			foreach ($data as $contenido) {
+				/* si imagen_sm */
+				if(!empty($contenido->imagen_sm) && file_exists($configsTipoCont->pathImagenesModulo . $contenido->imagen_sm)){
+					$contenido->imagen_sm = $configsTipoCont->urlImagenesModulo . $contenido->imagen_sm;
+					continue;
+				}
+				/* si imagen */
+				else if(!empty($contenido->imagen) && file_exists($configsTipoCont->pathImagenesModulo . $contenido->imagen)){
+					$contenido->imagen_sm = $configsTipoCont->urlImagenesModulo . $contenido->imagen;
+					continue;
+				}
+				else{
+					$contenido->imagen_sm = '';
+				}
+			}
 			return [
 				'data' => $data,
 				// 'data_complete' => $resultado,
 				'status'        => 'ok',
-				'time'	        => microtime(true) - $tiempoInicio,
+				'url_archivos_ctx' => $tipoContConfigs->urlArchivosModulo,
+				'url_imagenes_ctx' => $tipoContConfigs->urlImagenesModulo,
+				'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
+				'time'						 => microtime(true) - $tiempoInicio,
 			];
 		}
 		if ($tipoContBiblioteca == '____todo_jurisprudencia_relevante') {
@@ -234,23 +226,18 @@ class CreaNormasController extends ContController { //MasterController {
 			foreach ($categorias as $cat) {
 				$categoria = $cat->nombre;
 				$categoriaConfig =  json_decode($this->getParametro((object)['dominio' => "categoria_{$tipoContBiblioteca}", 'nombre' => $categoria])->config);
-				
-				$columnasPropias = " aa.id as id_contenido, aa.recomendacion, pcomite.descripcion as nombre_comite, anio ";
-				$leftJoinContition = " ";
 
 				$query =
-					"SELECT pt.nombre as tema, psubtema.nombre as subtema, 
-						{$columnasPropias}
+					"SELECT aa.id as id_contenido, pt.nombre as tema, psubtema.nombre as subtema, 
+						LEFT(aa.recomendacion, 180) as recomendacion_cortada, pcomite.descripcion as nombre_comite, anio, aa.orden as orden_propio, aa.estado as estado_biblioteca
 					FROM {$tipoContConfigs->config->tabla} aa 
 					LEFT JOIN xfr_parametros pt on aa.idp_tema = pt.id
 					LEFT JOIN xfr_parametros psubtema on aa.idp_subtema = psubtema.id 
 					LEFT JOIN xfr_parametros pcomite on aa.idp_comite = pcomite.id
-					{$leftJoinContition}
 					WHERE 1 = 1
 					ORDER BY recomendacion";
 
 				$data = collect($DB->select($query));
-
 			}
 
 			return [
@@ -258,9 +245,7 @@ class CreaNormasController extends ContController { //MasterController {
 				'status'        => 'ok',
 				'time'	        => microtime(true) - $tiempoInicio,
 			];
-
 		}
-
 	}
 
 	/**
@@ -281,28 +266,30 @@ class CreaNormasController extends ContController { //MasterController {
 
 		$id_contenido = $req->id_contenido;
 		$tipoContBiblioteca = $req->tipo_contenido ?? '';
-		$tipoContConfigs = $this->configsTipoContenido($tipoContBiblioteca);
+		$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
 		
 		/** NORMAS y JURISPRUDENCIA*/
 		if ($tipoContBiblioteca == 'normas' || $tipoContBiblioteca == 'jurisprudencia' || $tipoContBiblioteca == 'recomendaciones' ) {
 
 			$query =
-				"SELECT aa.*, aa.id as id_contenido FROM {$tipoContConfigs->config->tabla} aa 
+				"SELECT aa.*, aa.id as id_contenido FROM {$configsTipoCont->config->tabla} aa 
 				WHERE 1 = 1 and aa.id = {$id_contenido}
 				";
 
 			$dataBiblioteca = collect($DB->select($query))->first();
 			$dataBiblioteca->archivos = json_decode($dataBiblioteca->archivos);
-			$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
+			if (!empty($dataBiblioteca->imagen)) {
+					$dataBiblioteca->imagenUrl = $configsTipoCont->urlImagenesModulo . $dataBiblioteca->imagen;
+				}
 			if (!empty($dataBiblioteca->archivos))
-			foreach ($dataBiblioteca->archivos as $archivo) {
-				$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
-			}
+				foreach ($dataBiblioteca->archivos as $archivo) {
+					$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
+				}
 
 			return [
 				'data'             => $dataBiblioteca,
-				'url_archivos_ctx' => $tipoContConfigs->urlArchivosModulo,
-				'url_imagenes_ctx' => $tipoContConfigs->urlImagenesModulo,
+				'url_archivos_ctx' => $configsTipoCont->urlArchivosModulo,
+				'url_imagenes_ctx' => $configsTipoCont->urlImagenesModulo,
 				'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
 				'time'						 => microtime(true) - $tiempoInicio,
 			];
@@ -310,22 +297,25 @@ class CreaNormasController extends ContController { //MasterController {
 
 		if ($tipoContBiblioteca == 'jurisprudencia_relevante') {
 			$query =
-			"SELECT aa.*, aa.id as id_contenido FROM {$tipoContConfigs->config->tabla} aa 
+			"SELECT aa.*, aa.id as id_contenido FROM {$configsTipoCont->config->tabla} aa 
 			WHERE 1 = 1 and aa.id = {$id_contenido}
 			";
 
 		$dataBiblioteca = collect($DB->select($query))->first();
 		$dataBiblioteca->archivos = json_decode($dataBiblioteca->archivos);
-		$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
-		if (!empty($dataBiblioteca->archivos))
-		foreach ($dataBiblioteca->archivos as $archivo) {
-			$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
+		if (!empty($dataBiblioteca->imagen)) {
+			$dataBiblioteca->imagenUrl = $configsTipoCont->urlImagenesModulo . $dataBiblioteca->imagen;
+		}
+		if (!empty($dataBiblioteca->archivos)){
+			foreach ($dataBiblioteca->archivos as $archivo) {
+				$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
+			}
 		}
 
 		return [
 			'data'             => $dataBiblioteca,
-			'url_archivos_ctx' => $tipoContConfigs->urlArchivosModulo,
-			'url_imagenes_ctx' => $tipoContConfigs->urlImagenesModulo,
+			'url_archivos_ctx' => $configsTipoCont->urlArchivosModulo,
+			'url_imagenes_ctx' => $configsTipoCont->urlImagenesModulo,
 			'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
 			'time'						 => microtime(true) - $tiempoInicio,
 		];
@@ -390,12 +380,15 @@ class CreaNormasController extends ContController { //MasterController {
 		/* Se obtiene el contenido antes de ser modificado solo si existe*/
 		$contenidoOld = (object)[];
 
-		isset($data->id_contenido) ? false :
-			$contenidoOld = collect($DB->select("SELECT * from x_normas where id = {$data->id_contenido}"))->first();
+		!isset($data->id_contenido) ? false :
+			$contenidoOld = collect($DB->select("SELECT * from {$tipoContConfigs->config->tabla} where id = {$data->id_contenido}"))->first();
 
 		$contenido = [];
 		foreach ($data as $key => $value) {
-			if($key != 'tipo_contenido' && $key != 'id_contenido')
+			if($key == 'imagen' && $value !='')
+				$contenido[$key] = $this->funcionesContenidos->codigoUnico() . '.' . pathinfo($data->imagen, PATHINFO_EXTENSION);
+				
+			if($key != 'tipo_contenido' && $key != 'id_contenido' && $key != 'imagen')
 				$contenido[$key] = $value;
 		}
 

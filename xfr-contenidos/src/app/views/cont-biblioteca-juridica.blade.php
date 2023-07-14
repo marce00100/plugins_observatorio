@@ -392,8 +392,9 @@ ob_start(); ?>
 
         /* si es archivos concatenados*/
         if (elemCfg.campo == 'archivos' && text && text.length > 0) {
-          html = _.reduce(text.split(','), function (carry, elem, k) {
-            return carry + /*html*/`  <a href="${urlArchivosCtx}/${elem}" target="_blank"><i class="glyphicon glyphicon-cloud-download"></i> Descarga_${k + 1}</a>`
+          let archivosObj = JSON.parse(text);
+          html = _.reduce(archivosObj, function (carry, elem, k) {
+            return carry + /*html*/`<div><a href="${urlArchivosCtx}/${elem.archivo}" target="_blank"><i class="glyphicon glyphicon-cloud-download mr5"></i> ${elem.nombre}</a></div>`;
           }, '');
         }
 
@@ -414,14 +415,18 @@ ob_start(); ?>
           // }, '');
 
           let archivoshtml = !(val.archivos && val.archivos.length > 0) ? '' :
-            _.reduce(val.archivos.split(','), function (carry, elem, k) {
-              return carry + /*html*/`  <a href="${urlBibliotecaArchivos}/${elem}" target="_blank"><i class="glyphicon glyphicon-cloud-download"></i> Descarga_${k + 1}</a>`
+            (function () {
+              let archivosObj = JSON.parse(val.archivos);
+              let html = _.reduce(archivosObj, function (carry, elem, k) {
+                return carry + /*html*/`<div><a href="${urlBibliotecaArchivos}/${elem.archivo}" target="_blank"><i class="glyphicon glyphicon-cloud-download mr5"></i> ${elem.nombre}</a></div>`
               }, '');
+              return html;
+            })();
           if(ctxG.biblioteca == 'normas'){
             box += /*html*/
             `<div class="resumen">
               <div class="letra_titulo">${val.titulo}</div>
-              <div class="letra_0">${val.tipo}</div>
+              <div class="letra_0 mb10">${val.tipo}</div>
               <div class="letra_0">${archivoshtml}</div>
               <div class="flex justify-center mt5">
                 <button __btn_ver __biblioteca="${ctxG.biblioteca}" __id_biblioteca="${val.id_biblioteca}" 
@@ -433,7 +438,7 @@ ob_start(); ?>
             box += /*html*/
             `<div class="resumen">
               <div class="letra_titulo">${val.titulo}</div>
-              <div class="letra_0">${(val.nombre_tribunal && val.nombre_tribunal.length > 0) ? val.nombre_tribunal :
+              <div class="letra_0 mb10">${(val.nombre_tribunal && val.nombre_tribunal.length > 0) ? val.nombre_tribunal :
                                       (val.organo && val.organo.length > 0) ? val.organo : '' }</div>
               <div class="letra_0">${archivoshtml}</div>
               <div class="flex justify-center mt5">
@@ -481,7 +486,7 @@ ob_start(); ?>
             box += /*html*/
             `<div class="resumen">
               <div class="letra_titulo fw600">[${val.anio}]</div>
-              <div class="letra_titulo ">${val.texto}</div>
+              <div class="letra_titulo mb10">${val.texto}</div>
               <div class="letra_0 mt10">${archivoshtml}</div>
             </div>`;
           }

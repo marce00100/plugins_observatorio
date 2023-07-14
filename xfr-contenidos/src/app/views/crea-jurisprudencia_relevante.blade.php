@@ -86,14 +86,6 @@ ob_start();
 					</div>
 					
 					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
-            <!-- <div class="panel-heading  bg-dark dark  bg-primary--60_ mb10 p20 br8 br-a br-primary " style="height: auto; line-height: normal;">
-							<div class="text-white-dark mtn mbn fs16 flex align-center justify-evenly wrap gap-10">
-								<i class="fa fa-paperclip fa-lg grow-1"></i> 
-                <span class="ml10 grow-1" __cabecera_dt>Tipo Contenido </span>
-                <select class="grow-10 br6 fs18 fw600 text-444" __tipo_contenido  style="background-color: rgb(255 255 255 / 80%);" ></select>
-							</div>
-						</div> -->
-
 						<div class="panel-body ph5 fs16 text-333">
               <div class="mb10 br-b ">
                 <button __accion="nuevo" class="btn btn-sm bg-success--20  m5 br4 ph30 br-a br-dark">
@@ -188,88 +180,55 @@ ob_start();
             fields: [
               { field: 'id_contenido', type: 'hidden', },
               {
-                field: 'identificador', type: 'textarea', label: 'Título/Identificador', placeholder: '', title: '', help: '',
+                field: 'tema', type: 'textarea', label: 'Título/Tema', placeholder: '', title: '', help: '',
                 required: true, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'idp_tema', type: 'select', label: 'Tema', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'idp_subtema', type: 'select', label: 'Subtema', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'idp_categoria', type: 'select', label: 'Categoria', placeholder: '', title: '', help: '',
+                field: 'idp_tribunal', type: 'select', label: 'Tribunal/Categoría', placeholder: '', title: '', help: '',
                 required: true, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'cod_pais', type: 'select', label: 'Pais', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'idp_sistema', type: 'select', label: 'Sistema', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'idp_tribunal', type: 'select', label: 'Tribunal', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'organo', type: 'text', label: 'Organo', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'sintesis', type: 'text', label: 'Sintesis', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'relevancia', type: 'textarea', label: 'Relevancia', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'extracto', type: 'textarea', label: 'Extracto', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'fallo', type: 'textarea', label: 'Fallo', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'decision', type: 'textarea', label: 'Decisión', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'recomendacion', type: 'textarea', label: 'Recomendación', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
                 field: 'fecha', type: 'date', label: 'Fecha', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
+                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'pagina', type: 'text', label: 'Pagina', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
+                field: 'nr_sentencia', type: 'text', label: 'Nro. Sentencia', placeholder: '', title: '', help: '',
+                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'resumen', type: 'textarea', label: 'Resumen', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'sentencia', type: 'richtext', label: 'Sentencia', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'razonamiento', type: 'richtext', label: 'Razonamiento', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'decision', type: 'richtext', label: 'Decisión', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
                 field: 'orden', type: 'number', label: 'Orden', placeholder: '', title: 'Ordenar de menor a mayor', help: '',
-                required: false, columns_4: 1, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
+                required: false, columns_4: 2, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
               },
               {
                 field: 'estado', type: 'select', label: 'Estado', placeholder: '', title: '', help: '',
-                required: true, columns_4: 1, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+                required: true, columns_4: 2, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
-              // {
-              //   field: 'imagen', type: 'img', label: 'Imagen', placeholder: '', title: '', help: '',
-              //   required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              // },
+              {
+                field: 'imagen', type: 'img', label: 'Imagen', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
             ]
           },
         ],
       },
       listasPredefinidas: {
-        estados: [{ key: 1, texto: 'ACTIVO' }, {key: 0, texto:'INACTIVO' }],
-        tipos: ['General', 'Específica']
+        estados: [{ key: 1, texto: 'ACTIVO' }, {key: 0, texto:'INACTIVO' }]
       },
       /** Crea toda todas las secciones y sus filds */
       create_fields: (sections) => {
@@ -358,13 +317,13 @@ ob_start();
                               focus: false, //set focus editable area after Initialize summernote
                               fontSizes: ['8', '9', '10', '11', '12', '14','16', '18', '20', '24', '28', '32', '36', '40', '48', '56', '64', '72'],
                               toolbar: [
-                                ['style', ['style', 'bold', 'italic', 'underline', /*'clear' */ ] ],
+                                ['style', [/*'style',*/ 'bold', 'italic', 'underline', /*'clear' */ ] ],
                                 /* ['font', ['strikethrough']], */
                                 ['fontsize', ['fontsize']],
                                 /* ['color', ['color']], */
                                 ['para', ['ul', 'ol', 'paragraph']],
                                 // ['height', ['height']], 
-                                ['insert', ['link', 'picture', 'video', 'table']],
+                                ['insert', ['link', 'picture', /*'video',*/ 'table']],
                                 ['clear', ['clear']], 
                                 ['view', ['codeview']],
                               ],
@@ -444,31 +403,7 @@ ob_start();
         let optsEstados = xyzFuns.generaOpciones(regmodel.listasPredefinidas.estados, 'key', 'texto');
         $("[__rg_field=estado]").html(optsEstados);
         
-        /*     TEMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'temas'}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_tema]").html(opts).append(itemCrearNuevo);
-        });
-        /*     SUBTEMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'subtemas'}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_subtema]").html(opts).append(itemCrearNuevo);
-        });
-        /*     PAISES       */
-        $.post(ctxG.rutabase + '/get-paises', {}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'cod_pais', 'pais', ' ');
-          $("[__rg_field=cod_pais]").html(opts);
-        });
-        /*     CATEGORIA_NORMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'categoria_jurisprudencia'}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_categoria]").html(opts);
-        });
-        /*     SISTEMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'sistemas'}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_sistema]").html(opts).append(itemCrearNuevo);
-        });
+
         /*     TRIBUNALES       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'tribunales'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
@@ -650,9 +585,9 @@ ob_start();
               title: '', data: 'estado_contenido', orderable: true,
               render: function (data, type, row, meta) {
                 let html = /*html*/`
-                      <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor ${row.estado_biblioteca == 1 ? 'text-system-darker ' : 'text-danger-darker'}"  >
-                        <span class=" glyphicon glyphicon-book fa-lg">
-                          </span>
+                      <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor">
+                        <img src='${row.imagen_sm}' alt="" style="width:100%; max-width: 200px; min-width: 130px" >
+                        <span class="badge ${row.estado_biblioteca == 1 ? 'bg-success--20' : 'bg-danger--20'}">${row.estado_biblioteca == 1 ? '' : 'Inactivo'}</span>
                       </div>`;
                 return html;
               }
@@ -669,19 +604,7 @@ ob_start();
               }
             },
             {
-              title: 'Categoria', data: 'nombre_categoria', orderable: true,
-            },
-            {
-              title: 'Pais', data: 'nombre_pais', orderable: true,
-            },
-            {
-              title: 'Tema', data: 'tema', orderable: true,
-            },
-            {
-              title: 'Subtema', data: 'subtema', orderable: true,
-            },
-            {
-              title: 'Sistema', data: 'nombre_sistema', orderable: true,
+              title: 'Nro. Sentencia', data: 'nr_sentencia', orderable: true,
             },
             {
               title: 'Tribunal', data: 'nombre_tribunal', orderable: true,
@@ -705,23 +628,10 @@ ob_start();
     }
 
     let funs = {
-      /** Inicia el combo con tipos de contenidos  obtiene el dataset del primero*/
-      // iniciaTiposContenidos: () => {
-      //   $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'tipo_contenido'}, res =>{
-      //     let optsTipoContenido = xyzFuns.generaOpciones(res.data, 'nombre', 'descripcion');
-      //     $("[__tipo_contenido]").html(optsTipoContenido);
-
-      //     $("[__tipo_contenido] option")[0].selected = true; 
-      //     ctxG.tipo_contenido = $("[__tipo_contenido]").val();
-      //     ctxG.paramsTiposCont = res.data;
-      //     conT.fillDataT();
-      //     funs.crearFormulario();
-      //   });
-      // },
       cargarDatos: function () {
         xyzFuns.spinner();
         let obj = { admin: 'admin', tipo_contenido: ctxG.tipo_contenido }; 
-        $.post(`${ctxG.rutabase}/contents-normas`, obj, (resp) => {
+        $.post(`${ctxG.rutabase}/contents-crea-bj`, obj, (resp) => {
           ctxG.dataList = resp.data;
           conT.fillDataT();
           funs.spinner(0);
@@ -731,14 +641,6 @@ ob_start();
       crearFormulario: () => {
         regmodel.create_fields(regmodel.model.sections);
         regmodel.inicializaControles();
-
-        // let paramTipoCont = _.find(ctxG.paramsTiposCont, (item)=> {
-        //   return item.nombre == ctxG.tipo_contenido;
-        // });
-        // let paramConfig = JSON.parse(paramTipoCont.config);
-        // let camposExtrahtml = comps.extraFields.create(paramConfig.campos_extra);
-        // $("[__campos_extra]").html(camposExtrahtml);   
-
         $("[__archivos_anexos]").html(comps.archivos.create());     
 
       },
@@ -756,7 +658,7 @@ ob_start();
         $.post(ctxG.rutabase + '/get-bj', { id_contenido: id_contenido , tipo_contenido: ctxG.tipo_contenido }, (resp) => {
           let data = resp.data;
           let temporizador = setInterval(function(){
-            console.log('temp')
+            console.log('tempo')
             if($("select[__rg_field]").length > 0){
               funs.setData(data);
               clearInterval(temporizador);
@@ -764,7 +666,7 @@ ob_start();
           }, 100);
 
           // funs.setData(data);
-          $("#modal [__cabecera_modal] span").html(`Modificar jurisprudencia`);
+          $("#modal [__cabecera_modal] span").html(`Modificar `);
           xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })
@@ -772,16 +674,15 @@ ob_start();
       /** */
       setData: function (obj) {
         /* carga la imagen, luego elimina la propiedad field, asi ya no carga el input:file */
-        let imagen = obj.imagen;
-        $("[__imagen_img]").attr('src', imagen);
+        // let imagen = obj.imagen;
+        $("[__imagen_img]").attr('src', obj.imagenUrl);
         delete obj.imagen;
 
         xyzFuns.setData__fields(obj, '__rg_field');
         /* contenido */
-        // $('[__rg_field=contenido]').summernote('code', obj.contenido);
-        /* los campos extras */
-        // comps.extraFields.set(obj.campos_extra);
-        /* la lista de archivos*/
+        $('[__rg_field=sentencia]').summernote('code', obj.sentencia);
+        $('[__rg_field=razonamiento]').summernote('code', obj.razonamiento);
+        $('[__rg_field=decision]').summernote('code', obj.decision);
         comps.archivos.set(obj.archivos)
       },
       /** Obtiene toda la info de un contenido,  */
@@ -789,9 +690,11 @@ ob_start();
         let data = xyzFuns.getData__fields('__rg_field');
         data.tipo_contenido = ctxG.tipo_contenido;
         /* La imagen caratula */
-        // data.imagen = data.imagen.split('\\').pop();
+        data.imagen = data.imagen.split('\\').pop();
         /* el contenido */
-        // data.contenido = $("[__rg_field=contenido]").summernote('code');
+        data.sentencia = $("[__rg_field=sentencia]").summernote('code');
+        data.razonamiento = $("[__rg_field=razonamiento]").summernote('code');
+        data.decision = $("[__rg_field=decision]").summernote('code');
         /*Los campos extra  */
         // data.campos_extra = comps.extraFields.get();
         /* Los archivos anexos */
