@@ -1,5 +1,5 @@
 <?php
-function get_view_normas_create($xfrContenidos) {
+function get_view_jurisprudencia_relevante_create($xfrContenidos) {
 
   #CSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSS
   
@@ -82,7 +82,7 @@ ob_start();
 		<div id="wrap_contenidos" class="bg-content frctl">
 				<div class=" bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
 					<div class="pl40 mb10">
-						<h2 class="fw600 text-555 ">Gestión de Normas</h2>
+						<h2 class="fw600 text-555 ">Gestión de Jurisprudencia Relevante</h2>
 					</div>
 					
 					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
@@ -153,7 +153,7 @@ ob_start();
       modal: "#modal",
       dataTableTarget: "#dataT",
       dataList: [],
-      tipo_contenido: 'normas',
+      tipo_contenido: 'jurisprudencia_relevante',
       paramsTiposCont: [],
       mostrarMensajeFloat: function (obj) {
         new PNotify({
@@ -188,7 +188,7 @@ ob_start();
             fields: [
               { field: 'id_contenido', type: 'hidden', },
               {
-                field: 'titulo', type: 'textarea', label: 'Título', placeholder: '', title: '', help: '',
+                field: 'identificador', type: 'textarea', label: 'Título/Identificador', placeholder: '', title: '', help: '',
                 required: true, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
@@ -212,15 +212,35 @@ ob_start();
                 required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'tipo', type: 'select', label: 'Tipo', placeholder: '', title: '', help: '',
+                field: 'idp_tribunal', type: 'select', label: 'Tribunal', placeholder: '', title: '', help: '',
                 required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'resumen', type: 'textarea', label: 'Objetivo/Resumen', placeholder: '', title: '', help: '',
+                field: 'organo', type: 'text', label: 'Organo', placeholder: '', title: '', help: '',
+                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'sintesis', type: 'text', label: 'Sintesis', placeholder: '', title: '', help: '',
                 required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'texto', type: 'textarea', label: 'Texto específico', placeholder: '', title: '', help: '',
+                field: 'relevancia', type: 'textarea', label: 'Relevancia', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'extracto', type: 'textarea', label: 'Extracto', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'fallo', type: 'textarea', label: 'Fallo', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'decision', type: 'textarea', label: 'Decisión', placeholder: '', title: '', help: '',
+                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
+              },
+              {
+                field: 'recomendacion', type: 'textarea', label: 'Recomendación', placeholder: '', title: '', help: '',
                 required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
@@ -418,7 +438,7 @@ ob_start();
       },
       /**Iniciañizalos Selects */
       inicializaControles: () => {
-        let itenCrearNuevo = /*html*/`<option value ='parametro_nuevo'>Otro ... </option>`;
+        let itemCrearNuevo = /*html*/`<option value ='parametro_nuevo'>Otro ... </option>`;
 
         /*     ESTADO       */
         let optsEstados = xyzFuns.generaOpciones(regmodel.listasPredefinidas.estados, 'key', 'texto');
@@ -427,12 +447,12 @@ ob_start();
         /*     TEMAS       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'temas'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_tema]").html(opts).append(itenCrearNuevo);
+          $("[__rg_field=idp_tema]").html(opts).append(itemCrearNuevo);
         });
         /*     SUBTEMAS       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'subtemas'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_subtema]").html(opts).append(itenCrearNuevo);
+          $("[__rg_field=idp_subtema]").html(opts).append(itemCrearNuevo);
         });
         /*     PAISES       */
         $.post(ctxG.rutabase + '/get-paises', {}, res =>{
@@ -440,18 +460,20 @@ ob_start();
           $("[__rg_field=cod_pais]").html(opts);
         });
         /*     CATEGORIA_NORMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'categoria_normas'}, res =>{
+        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'categoria_jurisprudencia'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
           $("[__rg_field=idp_categoria]").html(opts);
         });
         /*     SISTEMAS       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'sistemas'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_sistema]").html(opts).append(itenCrearNuevo);
+          $("[__rg_field=idp_sistema]").html(opts).append(itemCrearNuevo);
         });
-        /*     TIPOS       */
-        let optsTipos = xyzFuns.generaOpcionesArray(regmodel.listasPredefinidas.tipos);
-        $("[__rg_field=tipo]").html(optsTipos);
+        /*     TRIBUNALES       */
+        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'tribunales'}, res =>{
+          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
+          $("[__rg_field=idp_tribunal]").html(opts).append(itemCrearNuevo);
+        });
 
       },
       /** Crea el formulario e inicializa los selects*/
@@ -647,7 +669,7 @@ ob_start();
               }
             },
             {
-              title: 'Categoria', data: 'categoria', orderable: true,
+              title: 'Categoria', data: 'nombre_categoria', orderable: true,
             },
             {
               title: 'Pais', data: 'nombre_pais', orderable: true,
@@ -662,7 +684,7 @@ ob_start();
               title: 'Sistema', data: 'nombre_sistema', orderable: true,
             },
             {
-              title: 'Tipo', data: 'tipo', orderable: true,
+              title: 'Tribunal', data: 'nombre_tribunal', orderable: true,
             },
             {
               title: 'Orden', data: 'orden_propio', orderable: true,
@@ -722,7 +744,7 @@ ob_start();
       },
       /** Para  nuevo muestramodal vacio */
       nuevo: () => {
-        $("#modal [__cabecera_modal] span").html(`Crear nueva norma`);
+        $("#modal [__cabecera_modal] span").html(`Crear Contenido`);
         funs.crearFormulario();
         xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },
@@ -742,7 +764,7 @@ ob_start();
           }, 100);
 
           // funs.setData(data);
-          $("#modal [__cabecera_modal] span").html(`Modificar`);
+          $("#modal [__cabecera_modal] span").html(`Modificar jurisprudencia`);
           xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })

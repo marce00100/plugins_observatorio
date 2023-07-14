@@ -311,6 +311,17 @@ class ContMigrateController extends MasterController {
 
       }
 
+      if($tipo_contenido == 'recomendaciones'){
+        $DB->statement(" ALTER TABLE  {$config->tabla} CHANGE COLUMN cod_recomendacion id INT AUTO_INCREMENT PRIMARY KEY");
+
+        $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN cod_tema idp_tema INT ");
+        $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN cod_subtema idp_subtema INT ");
+
+        $DB->statement(" UPDATE {$config->tabla} t set t.cod_comite  = ( select p.id from xfr_parametros p where p.dominio = 'comites' and p.temp = t.cod_comite )");
+        $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN cod_comite idp_comite INT ");             
+
+      }
+
       // $config->migrate = 1;
       // $param->config = json_encode($config);
       // $this->guardarObjetoTabla($param, 'xfr_parametros');

@@ -3,6 +3,7 @@
 require_once $xfrContenidos->path . "src/app/FuncionesContenidosController.php"; 
 require_once $xfrContenidos->path . "src/app/ContController.php"; 
 require_once $xfrContenidos->path . "src/app/ContBJController.php"; 
+
 require_once $xfrContenidos->path . "src/app/CreaNormasController.php"; 
 
 require_once $xfrContenidos->path . "src/app/ContMigrateController.php"; 
@@ -16,6 +17,9 @@ require_once $xfrContenidos->path . "src/app/views/cont-sentencias.blade.php";
 
 require_once $xfrContenidos->path . "src/app/views/cont-create.blade.php";
 require_once $xfrContenidos->path . "src/app/views/crea-normas.blade.php";
+require_once $xfrContenidos->path . "src/app/views/crea-jurisprudencia.blade.php";
+// require_once $xfrContenidos->path . "src/app/views/crea-jurisprudencia_relevante.blade.php";
+// require_once $xfrContenidos->path . "src/app/views/crea-recomendaciones.blade.php";
 
 require_once $xfrContenidos->path . "src/app/views/cont-migrate.blade.php";
 

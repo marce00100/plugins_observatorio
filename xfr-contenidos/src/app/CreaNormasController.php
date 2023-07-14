@@ -46,24 +46,24 @@ class CreaNormasController extends ContController { //MasterController {
 			$columnasPropias = ($tipoContBiblioteca == 'normas') ?
 					" aa.id as id_contenido, aa.titulo as titulo, aa.tipo "
 					:	" aa.id as id_contenido, aa.identificador as titulo, 
-											ptribunal.descripcion as nombre_tribunal, concat(aa.tribunal,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
+											ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
 
 			$leftJoinCondition = ($tipoContBiblioteca == 'normas') ?
 					" LEFT JOIN archivos a on a.modulo = 'normativa' 			and a.cod_modulo = aa.id "
 					:	" LEFT JOIN archivos a on a.modulo = 'jurisprudencia' and a.cod_modulo = aa.id 
-								LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.tribunal = ptribunal.nombre ";
+								LEFT JOIN xfr_parametros ptribunal on ptribunal.id = aa.idp_tribunal ";
 
 			$orderBy = ($tipoContBiblioteca == 'normas') ?
 					" categoria, nombre_pais, psistema.orden, tema, subtema, aa.orden " 
 					: " categoria, ptribunal.orden, nombre_pais, psistema.orden, tema, subtema, aa.orden ";
 
 			$query =
-				"SELECT pcategoria.nombre as categoria, pcategoria.orden as orden_categoria,
+				"SELECT pcategoria.descripcion as nombre_categoria, pcategoria.orden as orden_categoria,
 						ptema.nombre as tema, ptema.orden as orden_tema, psubtema.nombre as subtema, psubtema.orden as orden_subtema,
 						p.pais as nombre_pais, concat(p.sigla,'-',p.pais) as imagen_nombre_pais, 
 						psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, psistema.orden as orden_sistema, aa.orden
-						, GROUP_CONCAT(a.nombre_archivo) as archivos, 
-						aa.orden as orden_propio, aa.estado as estado_biblioteca, {$columnasPropias}
+						-- , GROUP_CONCAT(a.nombre_archivo) as archivos
+						, aa.orden as orden_propio, aa.estado as estado_biblioteca, {$columnasPropias}
 					FROM {$tipoContConfigs->config->tabla} aa 
 					LEFT JOIN xfr_parametros pcategoria on aa.idp_categoria = pcategoria.id
 					LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
@@ -73,8 +73,8 @@ class CreaNormasController extends ContController { //MasterController {
 					{$leftJoinCondition}
 					/* la linea anterior equivale a left join archivos a on a.modulo = normativa_o_jurisprudencia and a.cod_modulo = aa.id__o__id */
 					WHERE 1 = 1 
-					GROUP BY /* categoria, orden_categoria,*/ 
-					tema, subtema, nombre_pais, imagen_nombre_pais, nombre_sistema, orden, id_contenido									
+					-- GROUP BY /* categoria, orden_categoria,*/ 
+					-- tema, subtema, nombre_pais, imagen_nombre_pais, nombre_sistema, orden, id_contenido									
 					ORDER BY titulo -- {$orderBy}"; // nombre_pais, nombre_sistema desc, tema, subtema, {$orderBy}";
 
 			/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
@@ -93,7 +93,61 @@ class CreaNormasController extends ContController { //MasterController {
 		 * JURISPRUDENCIA  RELEVANTE
 		 * -----------------------------------------------------------------------------------------------------------
 		 * */
-		if ($tipoContBiblioteca == 'jurisprudencia_relevante') {
+
+		 /* eliminar este bloque */
+		if ( $tipoContBiblioteca == 'jurisprudencia_relevante') {
+			$categorias = $this->parametrosFrom((object)["dominio" => "categoria_jurisprudencia"]);
+			$tribunales = $this->parametrosFrom((object)["dominio" => "tribunales"]);
+			$sistemas 	= $this->parametrosFrom((object)["dominio" => "sistemas"]);
+
+			$resultado = (object)[];
+
+			/** se colocan las que son columnas propias  */
+			$columnasPropias = ($tipoContBiblioteca == 'normas') ?
+					" aa.id as id_contenido, aa.titulo as titulo, aa.tipo "
+					:	" aa.id as id_contenido, aa.identificador as titulo, 
+											ptribunal.descripcion as nombre_tribunal, concat(ptribunal.nombre,'-', ptribunal.descripcion) as imagen_nombre_tribunal, aa.organo ";
+
+			$leftJoinCondition = ($tipoContBiblioteca == 'normas') ?
+					" LEFT JOIN archivos a on a.modulo = 'normativa' 			and a.cod_modulo = aa.id "
+					:	" LEFT JOIN archivos a on a.modulo = 'jurisprudencia' and a.cod_modulo = aa.id 
+								LEFT JOIN xfr_parametros ptribunal on ptribunal.id = aa.idp_tribunal ";
+
+			$orderBy = ($tipoContBiblioteca == 'normas') ?
+					" categoria, nombre_pais, psistema.orden, tema, subtema, aa.orden " 
+					: " categoria, ptribunal.orden, nombre_pais, psistema.orden, tema, subtema, aa.orden ";
+
+			$query =
+				"SELECT pcategoria.descripcion as nombre_categoria, pcategoria.orden as orden_categoria,
+						ptema.nombre as tema, ptema.orden as orden_tema, psubtema.nombre as subtema, psubtema.orden as orden_subtema,
+						p.pais as nombre_pais, concat(p.sigla,'-',p.pais) as imagen_nombre_pais, 
+						psistema.descripcion as nombre_sistema, psistema.nombre as imagen_nombre_sistema, psistema.orden as orden_sistema, aa.orden
+						-- , GROUP_CONCAT(a.nombre_archivo) as archivos
+						, aa.orden as orden_propio, aa.estado as estado_biblioteca, {$columnasPropias}
+					FROM {$tipoContConfigs->config->tabla} aa 
+					LEFT JOIN xfr_parametros pcategoria on aa.idp_categoria = pcategoria.id
+					LEFT JOIN xfr_parametros ptema on aa.idp_tema = ptema.id
+					LEFT JOIN xfr_parametros psubtema on aa.idp_subtema = psubtema.id 
+					LEFT JOIN xfr_parametros psistema on aa.idp_sistema = psistema.id
+					LEFT JOIN  paises p on aa.cod_pais = p.cod_pais
+					{$leftJoinCondition}
+					/* la linea anterior equivale a left join archivos a on a.modulo = normativa_o_jurisprudencia and a.cod_modulo = aa.id__o__id */
+					WHERE 1 = 1 
+					-- GROUP BY /* categoria, orden_categoria,*/ 
+					-- tema, subtema, nombre_pais, imagen_nombre_pais, nombre_sistema, orden, id_contenido									
+					ORDER BY tema"; // nombre_pais, nombre_sistema desc, tema, subtema, {$orderBy}";
+
+			/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
+			$data = collect($DB->select($query));
+
+			return [
+				'data' => $data,
+				// 'data_complete' => $resultado,
+				'status'        => 'ok',
+				'time'	        => microtime(true) - $tiempoInicio,
+			];
+		}
+		if ($tipoContBiblioteca == '____todo_jurisprudencia_relevante') {
 			// $categorias = $this->parametrosFrom((object)["dominio" => "categoria_{$tipoContBiblioteca}"]);
 			// $resultado = (object)[];  
 
@@ -174,50 +228,36 @@ class CreaNormasController extends ContController { //MasterController {
 		 * -----------------------------------------------------------------------------------------------------------
 		 * */
 		if ($tipoContBiblioteca == 'recomendaciones') {
-			// $categorias = $this->parametrosFrom((object)["dominio" => "categoria_{$tipoContBiblioteca}"]);
-			// $resultado = (object)[];  
+			$categorias = $this->parametrosFrom((object)["dominio" => "categoria_{$tipoContBiblioteca}"]);
+			$resultado = (object)[];  
 
-			// foreach ($categorias as $cat) {
-			// 	$categoria = $cat->nombre;
-			// 	$categoriaConfig =  json_decode($this->getParametro((object)['dominio' => "categoria_{$tipoContBiblioteca}", 'nombre' => $categoria])->config);
+			foreach ($categorias as $cat) {
+				$categoria = $cat->nombre;
+				$categoriaConfig =  json_decode($this->getParametro((object)['dominio' => "categoria_{$tipoContBiblioteca}", 'nombre' => $categoria])->config);
 				
-			// 	$columnasPropias = " aa.cod_recomendacion as id_contenido, aa.recomendacion as texto, comite, anio ";
-			// 	$leftJoinContition = " LEFT JOIN archivos a on a.modulo = 'recomendacion' and a.cod_modulo = aa.cod_recomendacion ";
+				$columnasPropias = " aa.id as id_contenido, aa.recomendacion, pcomite.descripcion as nombre_comite, anio ";
+				$leftJoinContition = " ";
 
-			// 	$query =
-			// 		"SELECT pt.nombre as tema, psubtema.nombre as subtema, 
-			// 			aa.orden, GROUP_CONCAT(a.nombre_archivo) as archivos, {$columnasPropias}
-			// 		FROM {$tipoContConfig->tabla} aa 
-			// 		-- left join xfr_parametros pcategoria on aa.categoria = pcategoria.id
-			// 		LEFT JOIN xfr_parametros pt on aa.cod_tema = pt.id
-			// 		LEFT JOIN xfr_parametros psubtema on aa.cod_subtema = psubtema.id and psubtema.id_padre = pt.id
-			// 		-- LEFT JOIN  paises p on aa.cod_pais = p.cod_pais
-			// 		{$leftJoinContition}
-			// 		/* la linea anterior equivale a LEFT JOIN archivos a on a.modulo = normativa_o_jurisprudencia and a.cod_modulo = aa.id__o__id */
-			// 		LEFT JOIN comites com on aa.cod_comite = com.cod_comite
-			// 		WHERE 1 = 1
-			// 		GROUP BY tema, subtema, orden, id_contenido
-			// 		ORDER BY comite, tema, subtema, aa.orden";
+				$query =
+					"SELECT pt.nombre as tema, psubtema.nombre as subtema, 
+						{$columnasPropias}
+					FROM {$tipoContConfigs->config->tabla} aa 
+					LEFT JOIN xfr_parametros pt on aa.idp_tema = pt.id
+					LEFT JOIN xfr_parametros psubtema on aa.idp_subtema = psubtema.id 
+					LEFT JOIN xfr_parametros pcomite on aa.idp_comite = pcomite.id
+					{$leftJoinContition}
+					WHERE 1 = 1
+					ORDER BY recomendacion";
 
-			// 	$data = collect($DB->select($query));
-			// 	/** se obtiene un array con los elementos campo, que son los campos que seran parte de los niveles,  */
-			// 	$nivelesGroupBy = collect($categoriaConfig->niveles)->pluck('campo')->values()->all();
-			// 	$data = $data->groupBy($nivelesGroupBy);		
+				$data = collect($DB->select($query));
 
-			// 	$resultado->$categoria = [
-			// 		'data'             => $data,
-			// 		'categoria_config' => $categoriaConfig,
-			// 		'url_archivos_ctx' => $xfrContenidos->urlArchivos . $tipoContConfig->directorio . '/',					
-			// 		'url_imagenes_ctx' => $xfrContenidos->urlImagenes . $tipoContConfig->directorio . '/',
-			// 		'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/' ,
-			// 	];
-			// }
+			}
 
-			// return [
-			// 	'data_complete' => $resultado,
-			// 	'status'        => 'ok',
-			// 	'time'	        => microtime(true) - $tiempoInicio,
-			// ];
+			return [
+				'data' => $data,
+				'status'        => 'ok',
+				'time'	        => microtime(true) - $tiempoInicio,
+			];
 
 		}
 
@@ -244,7 +284,7 @@ class CreaNormasController extends ContController { //MasterController {
 		$tipoContConfigs = $this->configsTipoContenido($tipoContBiblioteca);
 		
 		/** NORMAS y JURISPRUDENCIA*/
-		if ($tipoContBiblioteca == 'normas' || $tipoContBiblioteca == 'jurisprudencia') {
+		if ($tipoContBiblioteca == 'normas' || $tipoContBiblioteca == 'jurisprudencia' || $tipoContBiblioteca == 'recomendaciones' ) {
 
 			$query =
 				"SELECT aa.*, aa.id as id_contenido FROM {$tipoContConfigs->config->tabla} aa 
@@ -269,6 +309,26 @@ class CreaNormasController extends ContController { //MasterController {
 		}
 
 		if ($tipoContBiblioteca == 'jurisprudencia_relevante') {
+			$query =
+			"SELECT aa.*, aa.id as id_contenido FROM {$tipoContConfigs->config->tabla} aa 
+			WHERE 1 = 1 and aa.id = {$id_contenido}
+			";
+
+		$dataBiblioteca = collect($DB->select($query))->first();
+		$dataBiblioteca->archivos = json_decode($dataBiblioteca->archivos);
+		$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
+		if (!empty($dataBiblioteca->archivos))
+		foreach ($dataBiblioteca->archivos as $archivo) {
+			$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
+		}
+
+		return [
+			'data'             => $dataBiblioteca,
+			'url_archivos_ctx' => $tipoContConfigs->urlArchivosModulo,
+			'url_imagenes_ctx' => $tipoContConfigs->urlImagenesModulo,
+			'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
+			'time'						 => microtime(true) - $tiempoInicio,
+		];
 
 			// $whereCondition = " and cod_sentencia = {$id_contenido} ";	
 			// $query =

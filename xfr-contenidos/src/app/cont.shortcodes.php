@@ -58,6 +58,11 @@ add_shortcode('fr_recomendaciones_create', function ($atts, $content) {
 	$html = get_view_recomendaciones_create($xfrContenidos);
 	return $html;
 });
+add_shortcode('fr_jurisprudencia_relevante_create', function ($atts, $content) {
+	global $xfrContenidos;
+	$html = get_view_jurisprudencia_relevante_create($xfrContenidos);
+	return $html;
+});
 
 
 

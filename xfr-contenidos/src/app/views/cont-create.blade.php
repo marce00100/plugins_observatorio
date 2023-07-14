@@ -33,7 +33,7 @@ ob_start();
 		background: #FFF;
 		width: auto !important;
 		max-width: 900px !important;
-		margin: 100px auto;
+    margin: 70px auto !important;
 	}
 
   /* Oculta la cabecera de la tabla el TH */
@@ -64,18 +64,22 @@ ob_start();
     /* margin-top: 10px !important; */
   }
 
-  .frctl .btnCloseModal{
+  /* Boton de cerrar en modal (en vez de close) */
+  .frctl .close-modal{
     position: absolute; 
     right: 10px; 
-    color: #ffffff; 
-    opacity: 0.7; 
+    color: #ffffff !important; 
+    opacity: 0.7!important; 
     text-shadow: none;
     padding: 10px;
     cursor: pointer;
   }
+  .frctl .close-modal:hover {    
+    opacity: 1!important; 
+  }
 </style>
 		<div id="wrap_contenidos" class="bg-content frctl">
-				<div class=" bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
+				<div class="font-roboto bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
 					<div class="pl40 mb10">
 						<h2 class="fw600 text-555 ">Gestión de Contenidos</h2>
 					</div>
@@ -106,12 +110,12 @@ ob_start();
 
 			<!-- -----------------------------------------          Modal  --------------------------------------------------- -->
 			<div id="modal" class="frctl white-popup-block popup-basic mfp-with-anim mfp-hide">
-				<div class="panel">
+				<div class="panel font-roboto">
 					<!-- panel heading -->
 					<div class="bg-primary--20 bg-theme1--40_ _text-333 flex align-center p15 ">
 						<i class="fa fa-paperclip fa-lg ml10"></i>
 						<h2 class="panel-title ml10" __cabecera_modal><span>__</span></h2>
-            <span class="close btnCloseModal"><i class="glyphicons glyphicons-remove_2"></i></span>
+            <span class="close-modal"><i class="glyphicons glyphicons-remove_2"></i></span>
 					</div>
 					<!-- end .panel-heading section -->
 					<!-- panel body -->
@@ -305,13 +309,13 @@ ob_start();
                               focus: false, //set focus editable area after Initialize summernote
                               fontSizes: ['8', '9', '10', '11', '12', '14','16', '18', '20', '24', '28', '32', '36', '40', '48', '56', '64', '72'],
                               toolbar: [
-                                ['style', ['style', 'bold', 'italic', 'underline', /*'clear' */ ] ],
+                                ['style', [/*'style',*/ 'bold', 'italic', 'underline'/*, 'clear' */ ] ],
                                 /* ['font', ['strikethrough']], */
                                 ['fontsize', ['fontsize']],
                                 /* ['color', ['color']], */
                                 ['para', ['ul', 'ol', 'paragraph']],
                                 // ['height', ['height']], 
-                                ['insert', ['link', 'picture', 'video', 'table']],
+                                ['insert', ['link', 'picture', /* 'video',*/ 'table']],
                                 ['clear', ['clear']], 
                                 ['view', ['codeview']],
                               ],
@@ -321,6 +325,8 @@ ob_start();
 
                             });
                 fieldsContainer.find(`[${sec.attr_field}=${field.field}]`).summernote('fontSize', 14);
+                /* para iniciar los menús desplegables. */
+                fieldsContainer.find(`.dropdown-toggle`).dropdown();
               }
             }
             if (field.type == 'checkbox') {
@@ -809,7 +815,7 @@ ob_start();
       /** DEL MODAL */
       $(ctxG.modal)       
         /* Cancel Modal*/
-        .on('click', "[__cerrar], .close", () => {
+        .on('click', "[__cerrar], .close-modal", () => {
           xyzFuns.closeModal();
         })
         .on('click', "[__save]", () => {

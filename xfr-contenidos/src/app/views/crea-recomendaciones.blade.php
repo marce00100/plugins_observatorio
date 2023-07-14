@@ -1,5 +1,5 @@
 <?php
-function get_view_normas_create($xfrContenidos) {
+function get_view_recomendaciones_create($xfrContenidos) {
 
   #CSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSSCSS
   
@@ -82,7 +82,7 @@ ob_start();
 		<div id="wrap_contenidos" class="bg-content frctl">
 				<div class=" bg-white col-xs-12 col-sm-offset-1_ col-sm-12  col-md-offset-1_ col-md-11 col-lg-offset-1 col-lg-10 col-xl-offset-2 col-xl-8  ">
 					<div class="pl40 mb10">
-						<h2 class="fw600 text-555 ">Gestión de Normas</h2>
+						<h2 class="fw600 text-555 ">Gestión de Recomendaciones</h2>
 					</div>
 					
 					<div class="panel br8 pb5 wp97"  style=" box-shadow: 1px 2px 9px 1px;">
@@ -153,7 +153,7 @@ ob_start();
       modal: "#modal",
       dataTableTarget: "#dataT",
       dataList: [],
-      tipo_contenido: 'normas',
+      tipo_contenido: 'recomendaciones',
       paramsTiposCont: [],
       mostrarMensajeFloat: function (obj) {
         new PNotify({
@@ -188,7 +188,7 @@ ob_start();
             fields: [
               { field: 'id_contenido', type: 'hidden', },
               {
-                field: 'titulo', type: 'textarea', label: 'Título', placeholder: '', title: '', help: '',
+                field: 'recomendacion', type: 'textarea', label: 'Recomendación', placeholder: '', title: '', help: '',
                 required: true, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
@@ -200,35 +200,15 @@ ob_start();
                 required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'idp_categoria', type: 'select', label: 'Categoria', placeholder: '', title: '', help: '',
-                required: true, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'cod_pais', type: 'select', label: 'Pais', placeholder: '', title: '', help: '',
+                field: 'idp_comite', type: 'select', label: 'Comité', placeholder: '', title: '', help: '',
                 required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'idp_sistema', type: 'select', label: 'Sistema', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'tipo', type: 'select', label: 'Tipo', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'resumen', type: 'textarea', label: 'Objetivo/Resumen', placeholder: '', title: '', help: '',
+                field: 'anio', type: 'int', label: 'Año', placeholder: '', title: '', help: '',
                 required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'texto', type: 'textarea', label: 'Texto específico', placeholder: '', title: '', help: '',
-                required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
-              },
-              {
-                field: 'fecha', type: 'date', label: 'Fecha', placeholder: '', title: '', help: '',
-                required: false, columns_4: 2, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
-              },
-              {
-                field: 'pagina', type: 'text', label: 'Pagina', placeholder: '', title: '', help: '',
+                field: 'pagina', type: 'text', label: 'Página', placeholder: '', title: '', help: '',
                 required: false, columns_4: 4, class: { bloque: 'mnw125', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input pn pl5 wp100' },
               },
               {
@@ -418,7 +398,7 @@ ob_start();
       },
       /**Iniciañizalos Selects */
       inicializaControles: () => {
-        let itenCrearNuevo = /*html*/`<option value ='parametro_nuevo'>Otro ... </option>`;
+        let itemCrearNuevo = /*html*/`<option value ='parametro_nuevo'>Otro ... </option>`;
 
         /*     ESTADO       */
         let optsEstados = xyzFuns.generaOpciones(regmodel.listasPredefinidas.estados, 'key', 'texto');
@@ -427,31 +407,20 @@ ob_start();
         /*     TEMAS       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'temas'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_tema]").html(opts).append(itenCrearNuevo);
+          $("[__rg_field=idp_tema]").html(opts).append(itemCrearNuevo);
         });
         /*     SUBTEMAS       */
         $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'subtemas'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_subtema]").html(opts).append(itenCrearNuevo);
+          $("[__rg_field=idp_subtema]").html(opts).append(itemCrearNuevo);
         });
-        /*     PAISES       */
-        $.post(ctxG.rutabase + '/get-paises', {}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'cod_pais', 'pais', ' ');
-          $("[__rg_field=cod_pais]").html(opts);
-        });
-        /*     CATEGORIA_NORMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'categoria_normas'}, res =>{
+
+
+        /*     COMITES       */
+        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'comites'}, res =>{
           let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_categoria]").html(opts);
+          $("[__rg_field=idp_comite]").html(opts).append(itemCrearNuevo);
         });
-        /*     SISTEMAS       */
-        $.post(ctxG.rutagral + '/get-parametros-from', {dominio: 'sistemas'}, res =>{
-          let opts = xyzFuns.generaOpciones(res.data, 'id', 'descripcion', ' ');
-          $("[__rg_field=idp_sistema]").html(opts).append(itenCrearNuevo);
-        });
-        /*     TIPOS       */
-        let optsTipos = xyzFuns.generaOpcionesArray(regmodel.listasPredefinidas.tipos);
-        $("[__rg_field=tipo]").html(optsTipos);
 
       },
       /** Crea el formulario e inicializa los selects*/
@@ -636,7 +605,7 @@ ob_start();
               }
             },
             {
-              title: 'Titulo', data: 'titulo', orderable: true, searchable: true, className: 'mnw200 fw600', type: 'html', 
+              title: 'Recomendación', data: 'recomendacion', orderable: true, searchable: true, className: 'mnw200 fw600', type: 'html', 
               render: function (data, type, row, meta) {
                 let html = /*html*/`
                       <div __accion="editar" __id_contenido="${row.id_contenido}" class="cursor">
@@ -647,22 +616,16 @@ ob_start();
               }
             },
             {
-              title: 'Categoria', data: 'categoria', orderable: true,
-            },
-            {
-              title: 'Pais', data: 'nombre_pais', orderable: true,
-            },
-            {
               title: 'Tema', data: 'tema', orderable: true,
             },
             {
               title: 'Subtema', data: 'subtema', orderable: true,
             },
             {
-              title: 'Sistema', data: 'nombre_sistema', orderable: true,
+              title: 'Sistema', data: 'nombre_comite', orderable: true,
             },
             {
-              title: 'Tipo', data: 'tipo', orderable: true,
+              title: 'Año', data: 'anio', orderable: true,
             },
             {
               title: 'Orden', data: 'orden_propio', orderable: true,
@@ -700,6 +663,8 @@ ob_start();
         xyzFuns.spinner();
         let obj = { admin: 'admin', tipo_contenido: ctxG.tipo_contenido }; 
         $.post(`${ctxG.rutabase}/contents-normas`, obj, (resp) => {
+          if($.fn.DataTable.isDataTable(conT.dt))
+                conT.dt.destroy();
           ctxG.dataList = resp.data;
           conT.fillDataT();
           funs.spinner(0);
@@ -722,7 +687,7 @@ ob_start();
       },
       /** Para  nuevo muestramodal vacio */
       nuevo: () => {
-        $("#modal [__cabecera_modal] span").html(`Crear nueva norma`);
+        $("#modal [__cabecera_modal] span").html(`Crear Contenido`);
         funs.crearFormulario();
         xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },
@@ -742,7 +707,7 @@ ob_start();
           }, 100);
 
           // funs.setData(data);
-          $("#modal [__cabecera_modal] span").html(`Modificar`);
+          $("#modal [__cabecera_modal] span").html(`Modificar jurisprudencia`);
           xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })
@@ -826,8 +791,8 @@ ob_start();
             complete: function (res) {
               resp = res.responseJSON;
               funs.spinner(false);
-              if($.fn.DataTable.isDataTable(conT.dt))
-                conT.dt.destroy();
+              // if($.fn.DataTable.isDataTable(conT.dt))
+              //   conT.dt.destroy();
 
               funs.cargarDatos();
 
