@@ -1,0 +1,6 @@
+{
+    "require": {
+        "tightenco/collect": "^8.83",
+        "phpoffice/phpspreadsheet": "^1.29"
+    }
+}

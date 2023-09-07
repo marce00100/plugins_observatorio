@@ -64,12 +64,10 @@ function carga_estilosreg() {
 // if (!class_exists('ComposerAutoloaderInit7ec658522a46107b331db410568cea2b')) {
 //   require_once XFL_Core::getPath()  . 'classes/vendor/autoload.php';
 // }
-if (!class_exists('ComposerAutoloaderInit3dc9303180f8a626c123ddad83a04b0f')) {
+if (!class_exists('ComposerAutoloaderInit48e613fc167f099dd2191fef1d8c8cb4')) {
     require_once XFL_Core::getPath()  . 'classes/vendor_php7/vendor/autoload.php';
 }
-// if (!class_exists('ComposerAutoloaderInit81f8a6b8a0f5810890121398a94355d2')) {
-//     require_once XFL_Core::getPath()  . 'classes/vendor_php7/vendor/autoload.php';
-// }
+
 
 /**
  * Carga controlador de rutas en formato class@function
