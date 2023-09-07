@@ -33,7 +33,7 @@ ob_start();
 		background: #FFF;
 		width: auto !important;
 		max-width: 900px !important;
-		margin: 100px auto;
+		margin: 100px auto !important;
 	}
 
   /* Oculta la cabecera de la tabla el TH */
@@ -646,7 +646,7 @@ ob_start();
       },
       /** Para  nuevo muestramodal vacio */
       nuevo: () => {
-        $("#modal [__cabecera_modal] span").html(`Crear Contenido`);
+        $("#modal [__cabecera_modal] span").html(`Jurisprudencia Relevante`);
         funs.crearFormulario();
         xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },
@@ -666,7 +666,7 @@ ob_start();
           }, 100);
 
           // funs.setData(data);
-          $("#modal [__cabecera_modal] span").html(`Modificar `);
+          $("#modal [__cabecera_modal] span").html(`Jurisprudencia Relevante`);
           xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })

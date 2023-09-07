@@ -39,12 +39,6 @@ class ContController extends MasterController {
 		
 		$obj->textoBusqueda = $req->texto_busqueda ?? null;
 
-		/* SENTENCIAS */
-		if ($obj->tipo_contenido == 'sentencias') {
-			$contenidos = $this->contentsSentencias($obj);
-			return ['TODO' => 'Revisar sentencias premiadas '];
-		}	
-
 		$condicion = '';
 		$condicion .= empty($obj->estado_contenido) ? '' : " AND estado_contenido = {$obj->estado_contenido} ";
 		$condicion .= empty($obj->tipo_contenido)   ? '' : " AND tipo_contenido like '{$obj->tipo_contenido}%' ";
@@ -201,83 +195,6 @@ class ContController extends MasterController {
 			'status' 	=> 'ok',
 			'time'		=> microtime(true) - $tiempoInicio,
 		];
-	}
-
-	/**
-	 * SENTENCIAS
-	 */
-	public function contentsSentencias($obj) {
-		$tiempoInicio = microtime(true);
-		/* Quitar si no es WP */
-		// $req = (object)$req->get_params();
-		$site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
-		if($site != 'observatorio')
-			return ['status' => 'error', 'msg' => 'No es el sitio del observatorio'];
-		$condicionSearch = '';
-		if($obj->searchValue )
-			$condicionSearch =  $obj->searchValue ? 
-			" AND (titulo like '%{$obj->searchValue}%' 
-			OR materia like '%{$obj->searchValue}%' OR tipo like '%{$obj->searchValue}%' OR anio like '%{$obj->searchValue}%' )" : "";
-
-		$DB = $this;
-		global $xfrContenidos;
-
-		$data = [];
-
-		/**  
-		 * -----------------------------------------------------------------------------------------------------------
-		 * SENTENCIAS PREMIADAS
-		 * -----------------------------------------------------------------------------------------------------------
-		 * */
-		$tipoContenidoConfig =  json_decode($this->getParametro((object)['dominio' => "tipo_contenido", 'nombre' => 'sentencias'])->config);
-				
-				// $leftJoinArchivosContition = " LEFT JOIN archivos a on a.modulo = 'recomendacion' and a.cod_modulo = aa.cod_recomendacion ";
-				// $columnasPropias = " aa.cod_sentencia as id_biblioteca, aa.recomendacion as texto, comite, anio ";
-				$orderPropio = " anio desc, fechayhora_enviado desc ";
-				$query =
-					"SELECT aa.cod_sentencia as id_biblioteca, aa.fechayhora_enviado, aa.estado, aa.tema as titulo, aa.anio, sm.materia,  st.tipo, analisis,
-					/* descriptores, dictada,  autoridades, hechos, proceso1, proceso2,proceso3, proceso4, analisis, */
-					imagen, archivos, aa.orden as orden_jurisprudencia_relevante
-					, CASE WHEN (imagen IS NOT NULL AND imagen != '') THEN  CONCAT(SUBSTRING_INDEX(imagen, '.', 1), '_s.', SUBSTRING_INDEX(imagen, '.', -1)) 
-						ELSE '' END AS imagen_sm
-						
-					FROM sentencias aa 
-					LEFT JOIN sentencias_materias sm on sm.cod_materia = aa.cod_materia
-					LEFT JOIN sentencias_tipos st on st.cod_tipo = aa.cod_tipo 
-					WHERE 1 = 1 and estado like 'premiada' {$condicionSearch}
-					ORDER BY {$orderPropio} 
-					LIMIT {$obj->start}, {$obj->length}  ";
-
-				$lista_contenidos = collect($DB->select($query));
-
-				foreach($lista_contenidos as $item){
-					$item->resumen =  substr(trim($item->analisis), 0, 250);
-				}
-
-
-
-
-				global $xfrContenidos;
-
-				$recordsTotal = collect($DB->select("SELECT count(*) as total  FROM sentencias  WHERE estado like 'premiada'  "))->first()->total;
-
-				$recordsFiltered =  collect($DB->select("SELECT count(*) as total  FROM sentencias  WHERE estado like 'premiada'  {$condicionSearch} "))->first()->total;
-
-				return (object)[
-					// 'data'             => $lista_contenidos,
-					'data'            => $lista_contenidos->toArray(),
-					// 'data_tipo_contenido'  => $configsTipoCont,
-					'draw'            => $obj->draw,
-					'recordsTotal'    => $recordsTotal,
-					'recordsFiltered' => $recordsFiltered,
-					'query' 					=> $query,
-					'categoria_config' => $tipoContenidoConfig,
-					'url_archivos_ctx' => $xfrContenidos->urlArchivos,					
-					'url_imagenes_ctx' => $xfrContenidos->urlImagenes,
-					'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/' ,
-				];
-			// }
-
 	}
 
 	/**

@@ -268,35 +268,8 @@ class CreaBJController extends ContController { //MasterController {
 		$tipoContBiblioteca = $req->tipo_contenido ?? '';
 		$configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
 		
-		/** NORMAS y JURISPRUDENCIA*/
-		if ($tipoContBiblioteca == 'normas' || $tipoContBiblioteca == 'jurisprudencia' || $tipoContBiblioteca == 'recomendaciones' ) {
-
-			$query =
-				"SELECT aa.*, aa.id as id_contenido FROM {$configsTipoCont->config->tabla} aa 
-				WHERE 1 = 1 and aa.id = {$id_contenido}
-				";
-
-			$dataBiblioteca = collect($DB->select($query))->first();
-			$dataBiblioteca->archivos = json_decode($dataBiblioteca->archivos);
-			if (!empty($dataBiblioteca->imagen)) {
-					$dataBiblioteca->imagenUrl = $configsTipoCont->urlImagenesModulo . $dataBiblioteca->imagen;
-				}
-			if (!empty($dataBiblioteca->archivos))
-				foreach ($dataBiblioteca->archivos as $archivo) {
-					$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
-				}
-
-			return [
-				'data'             => $dataBiblioteca,
-				'url_archivos_ctx' => $configsTipoCont->urlArchivosModulo,
-				'url_imagenes_ctx' => $configsTipoCont->urlImagenesModulo,
-				'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
-				'time'						 => microtime(true) - $tiempoInicio,
-			];
-		}
-
-		if ($tipoContBiblioteca == 'jurisprudencia_relevante') {
-			$query =
+		/** NORMAS -  JURISPRUDENCIA - RECOMENDACIONES - JURISPRUDENCIA_RELEVANTE*/
+		$query =
 			"SELECT aa.*, aa.id as id_contenido FROM {$configsTipoCont->config->tabla} aa 
 			WHERE 1 = 1 and aa.id = {$id_contenido}
 			";
@@ -304,13 +277,12 @@ class CreaBJController extends ContController { //MasterController {
 		$dataBiblioteca = collect($DB->select($query))->first();
 		$dataBiblioteca->archivos = json_decode($dataBiblioteca->archivos);
 		if (!empty($dataBiblioteca->imagen)) {
-			$dataBiblioteca->imagenUrl = $configsTipoCont->urlImagenesModulo . $dataBiblioteca->imagen;
-		}
-		if (!empty($dataBiblioteca->archivos)){
+				$dataBiblioteca->imagenUrl = $configsTipoCont->urlImagenesModulo . $dataBiblioteca->imagen;
+			}
+		if (!empty($dataBiblioteca->archivos))
 			foreach ($dataBiblioteca->archivos as $archivo) {
 				$archivo->archivoUrl = $configsTipoCont->urlArchivosModulo . $archivo->archivo;
 			}
-		}
 
 		return [
 			'data'             => $dataBiblioteca,
@@ -320,44 +292,6 @@ class CreaBJController extends ContController { //MasterController {
 			'time'						 => microtime(true) - $tiempoInicio,
 		];
 
-			// $whereCondition = " and cod_sentencia = {$id_contenido} ";	
-			// $query =
-			// 	"SELECT aa.cod_sentencia as id_contenido, 
-			// 	ptribunal.descripcion as nombre_tribunal, concat(aa.categoria,'-', ptribunal.descripcion) as imagen_nombre_tribunal, ptribunal.orden as orden_tribunal,
-			// 	tema as titulo, resumen, fecha, nr_sentencia as nro_sentencia, 
-			// 	sentencia, razonamiento, decision, 
-			// 	imagen, archivos, aa.orden as orden_jurisprudencia_relevante					
-			// 	FROM {$tipoContConfig->tabla} aa 
-			// 	LEFT JOIN xfr_parametros ptribunal on ptribunal.dominio like 'tribunal%' and aa.categoria like ptribunal.nombre 
-			// 	WHERE 1 = 1  {$whereCondition}
-			// 	";
-
-			// $data = collect($DB->select($query))->first();
-			// if(!$data)
-			// 	return ['status' => 'error', 'msg' => 'No existe el registro.'];
-
-			// /* Se obtiene las configuraciones de rutas del parametro del tipo contenido */
-			// $configsTipoCont = $this->configsTipoContenido($tipoContBiblioteca);
-
-			// /** Acondicionamos algunos campos */
-			// if (!empty($data->imagen) && file_exists($configsTipoCont->pathImagenesModulo . $data->imagen))
-			// $data->imagen = $configsTipoCont->urlImagenesModulo . $data->imagen;
-			// /* si apunta a una imagen pero no existe */
-			// else if (!empty($data->imagen) && !file_exists($configsTipoCont->pathImagenesModulo . $data->imagen))
-			// $data->imagen = null;
-
-			// return [
-			// 	'data'             => $data,
-			// 	'url_archivos_ctx' => $xfrContenidos->urlArchivos . $tipoContConfig->directorio . '/',
-			// 	'url_imagenes_ctx' => $xfrContenidos->urlImagenes . $tipoContConfig->directorio . '/',
-			// 	'url_recursos_ctx' => $xfrContenidos->urlRecursos . 'img/',
-
-			// ];
-		}
-
-		return [
-			// 'global' => $xfrContenidos,
-		];
 
 	}
 
@@ -394,29 +328,6 @@ class CreaBJController extends ContController { //MasterController {
 
 		$contenido = (object)$contenido;
 		$contenido->id = $data->id_contenido ?? null;
-
-		// $contenido                       = (object)[];
-		// $contenido->id                   = $data->id_contenido ?? null;
-		// $contenido->tipo_contenido       = $data->tipo_contenido;
-		// $contenido->fecha_publicacion    = empty($data->fecha_publicacion) ? null : $data->fecha_publicacion;
-		// $contenido->titulo               = $data->titulo;
-		// $contenido->resumen              = $data->resumen ?? '';
-		// $contenido->contenido            = $data->contenido;
-		// $contenido->estado_contenido     = $data->estado_contenido;
-		// $contenido->texto                = $data->texto ?? '';
-		// $contenido->texto_token          = $data->texto_token ?? '';
-		// $contenido->orden                = $data->orden ?? 1;
-		// $contenido->campos_extra         = $data->campos_extra ? json_encode($data->campos_extra, JSON_UNESCAPED_UNICODE) : '';
-		// // $contenido->imagenes             = $data->imagenes ?? '';
-		// $contenido->texto 							 = $this->funcionesContenidos->quitarHtmlTags($contenido->contenido);
-		// $contenido->texto_token					 = Normaliza::lematizaConStemSW($contenido->texto);
-
-		/* Si no llega imagen o vacio , entonces no se cambio la imagen*/
-		// empty($data->imagen) ? false : $contenido->imagen = $this->funcionesContenidos->codigoUnico() . '.' . pathinfo($data->imagen, PATHINFO_EXTENSION);;
-
-
-
-
 
 		/* GESTION ARCHIVOS  controla los nuevos y los que se deben borrar y actualizar el campo de la tabla */
 		$controlArchivos = (object)[];
@@ -536,6 +447,7 @@ class CreaBJController extends ContController { //MasterController {
 		$objParam->nombre       =  $descripcion;	
 		$objParam->descripcion  = $descripcion;	
 		$objParam->activo			  = 1;	
+		$objParam->orden			  = 100000;	
 		return $this->guardarObjetoTabla($objParam, 'xfr_parametros');
 	}
 
@@ -589,19 +501,6 @@ class CreaBJController extends ContController { //MasterController {
 			'data' => collect($DB->select("SELECT * from paises "))
 		];
 	}
-	/* POST retorn a lista de paises */
-	// public function distinct(WP_REST_Request $req){
-	// 	$req = (object)$req->get_params();
-	// 	$tabla = $req->modulo;
-	// 	$campo = $req->campo;
-	// 	$DB = $this;
-	// 	return collect($DB->select("SELECT distinct({$campo}) from {$tabla} "));
-	// }
-
-
-
-
-
 
 
 

@@ -72,7 +72,7 @@ function agregarBotonSearch() {
             let html = /*html*/`
               <div class="p5 mt5" style="border-bottom: 1px solid #ccc">
                 <h5 class="cursor" __contenido_id="${item.id_contenido}" __tipo_contenido="${item.tipo_contenido}">
-                  <a class="text-333 fw600" href="${ctxGSearch.dirRaiz}/${item.tipo_contenido}?id=${item.id_contenido}" >${item.titulo}</a> 
+                  <a class="text-333 fw600" href="${ctxGSearch.dirRaiz}/${item.tipo_contenido}/?id=${item.id_contenido}" >${item.titulo}</a> 
                 </h5>
                 <em>Publicado en: ${item.fecha_publicacion}; Sección: ${item.tipo_contenido}</em>
                 <div>${item.resumen}</div>

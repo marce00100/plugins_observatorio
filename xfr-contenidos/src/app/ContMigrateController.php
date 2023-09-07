@@ -8,38 +8,38 @@ use FuncionesContenidosController as FuncionesContenidos;
 class ContMigrateController extends MasterController {
   /* Propiedad que es la instancia de Funciones Contenidos */
   public $funcionesContenidos;
-  private $modulosVista;
-  private $modulos;
+  // private $modulosVista;
+  // private $modulos;
 
   public function __construct() {
     $this->funcionesContenidos = new FuncionesContenidos();
 
-    $this->modulosVista = [
-      'magistratura' => [
-        ['Todos los contenidos (noticias y comunicados)' => 'noticias']
-      ],
-      'observatorio' => [
-        ['Todos los Contenidos (noticias y Activs)'       => 'contenidos'],
-        ['Noticias'                   => 'noticias'],
-        ['Actividades'                => 'actividades'],
-        ['Toda la Biblioteca juridica'=> 'biblioteca_juridica'], 
-        ['Normas'                     => 'normas'], 
-        ['Jurisprudencia'             => 'jurisprudencia'],
-        ['Recomendaciones'            => 'recomendaciones'],
-        ['Jurisprudencias Relevantes' => 'jurisprudencia_relevante']
-      ]
+    // $this->modulosVista = [
+    //   'magistratura' => [
+    //     ['Todos los contenidos (noticias y comunicados)' => 'noticias']
+    //   ],
+    //   'observatorio' => [
+    //     ['Todos los Contenidos (noticias y Activs)'       => 'contenidos'],
+    //     ['Noticias'                   => 'noticias'],
+    //     ['Actividades'                => 'actividades'],
+    //     ['Toda la Biblioteca juridica'=> 'biblioteca_juridica'], 
+    //     ['Normas'                     => 'normas'], 
+    //     ['Jurisprudencia'             => 'jurisprudencia'],
+    //     ['Recomendaciones'            => 'recomendaciones'],
+    //     ['Jurisprudencias Relevantes' => 'jurisprudencia_relevante']
+    //   ]
 
-    ];
+    // ];
   } 
 
-  public function obtenerModulosMigrar() {
-    $site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
-    return [
-      'sistema'      => $site,
-      'migraciones'  => $this->modulosVista[$site],
-    ];
+  // public function obtenerModulosMigrar() {
+  //   $site = $this->valorParametro((object)['dominio' => 'site', 'nombre' => 'site']);
+  //   return [
+  //     'sistema'      => $site,
+  //     'migraciones'  => $this->modulosVista[$site],
+  //   ];
 
-  }
+  // }
 
   /**
    * POST para migrar las tablas del Observatorio 
@@ -176,6 +176,7 @@ class ContMigrateController extends MasterController {
       || $tipo_contenido == 'jurisprudencia_relevante'  || $tipo_contenido == 'recomendaciones')) {
         
       $param = collect($DB->select("SELECT * from xfr_parametros where dominio like 'biblioteca_juridica' and nombre like '{$tipo_contenido}' "))->first();
+      /** se obtiene la informacion para la migracion de la columna temp */
       $config = (object)json_decode($param->temp);
 
       // if ($config->migrate && $config->migrate == 1) {
@@ -307,6 +308,76 @@ class ContMigrateController extends MasterController {
 
       ];
       
+    }
+
+        /**
+     * ------------------------------------------------------------------------
+     * SENTENCIAS
+     * ------------------------------------------------------------------------
+     */
+    if ($sistema == 'observatorio' && $tipo_contenido == 'sentencias_premiadas' ) {
+      $config = (object)[
+        'tabla' => 'x_sentencias_premiadas',
+        'old_table' => 'sentencias'
+      ];
+
+      $DB->statement("DROP TABLE IF EXISTS {$config->tabla} ");
+      $DB->statement("CREATE TABLE {$config->tabla} as SELECT * FROM {$config->old_table}");
+
+
+      $DB->statement(" ALTER TABLE {$config->tabla} ADD COLUMN IF NOT EXISTS orden int "); /* este campo ya esta presente en Normativa, Jurisprudencia, recomendaciones*/
+      // $DB->statement(" ALTER TABLE {$config->tabla} ADD COLUMN IF NOT EXISTS imagen text ");
+      $DB->statement(" ALTER TABLE {$config->tabla} ADD COLUMN IF NOT EXISTS archivos text ");
+      $DB->statement(" ALTER TABLE {$config->tabla} DROP COLUMN archivo "); /* se elimina la columna archivo ya que ahora existe la columna archivos*/
+
+
+      $DB->statement(" UPDATE {$config->tabla} t set t.orden = 1");
+
+      $list = collect($DB->select("SELECT * FROM {$config->tabla}"));
+
+      /* para el join con la tabla  archivos */
+      $nombre_cod_biblioteca = 'cod_sentencia';
+      $nombre_modulo = 'sentencia';
+
+      /* sentencias_materias y sentencias_tipos   */
+      $DB->statement(" UPDATE {$config->tabla} t set t.cod_materia = ( select p.id from xfr_parametros p where p.dominio = 'sentencias_materias' and p.orden = t.cod_materia )");
+      $DB->statement(" UPDATE {$config->tabla} t set t.cod_tipo    = ( select p.id from xfr_parametros p where p.dominio = 'sentencias_tipos' and p.orden = t.cod_tipo )");
+
+
+      /* imagenes y archivos para todos los casos */
+      foreach ($list as $item) {
+        $fieldsUpdate = (object)[];
+        /* solo tienen una imagen a lo mucho en cualquiera de los casos */
+        // $imagen = collect($DB->select("SELECT * from imagenes where codigo = {$item->$nombre_cod_biblioteca} and modulo = '{$nombre_modulo}' AND categoria LIKE '%grand%'"))->first();
+        // $fieldsUpdate->imagen = isset($imagen) ? $imagen->nombre : '';
+
+        // $archivos = collect($DB->select("SELECT * from archivos where cod_modulo = {$item->$nombre_cod_biblioteca} and modulo = '{$nombre_modulo}' "))->pluck('nombre_archivo')->implode(',');
+        $archivos = collect($DB->select("SELECT * from archivos where cod_modulo = {$item->$nombre_cod_biblioteca} and modulo = '{$nombre_modulo}' "));
+        $archivosObj = [];
+        foreach($archivos as $arch){
+          $archivosObj[] = (object)[ 'nombre' => $arch->nombre_original, 'archivo' => $arch->nombre_archivo];
+        }
+        $fieldsUpdate->archivos = json_encode($archivosObj, JSON_UNESCAPED_UNICODE);
+        global $wpdb;
+        $wpdb->update($config->tabla, get_object_vars($fieldsUpdate),  array($nombre_cod_biblioteca => $item->$nombre_cod_biblioteca));
+
+      }
+
+      /* se cambian de nombre las columnas y se actualizan los parametros*/
+
+      $DB->statement(" ALTER TABLE  {$config->tabla} CHANGE COLUMN cod_sentencia id INT AUTO_INCREMENT PRIMARY KEY");
+
+      $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN cod_materia idp_sentencia_materia INT ");
+      $DB->statement(" ALTER TABLE {$config->tabla} CHANGE COLUMN cod_tipo idp_sentencia_tipo INT ");
+
+
+      return (object)[
+        'status' => 'ok',
+        'msg' => 'Se actualizaron los datos de ' . $tipo_contenido,
+
+      ];
+
+
     }
 
     return (object)[

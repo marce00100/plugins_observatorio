@@ -24,21 +24,30 @@ ob_start(); ?>
         </div>
         <div class="form-group wp40">
           <label for="tipo_contenido" class="form-label">Tipo Contenido</label>
-          <input id="tipo_contenido" name="tipo_contenido" type="text" __migrate_field="tipo_contenido"
-            class="form-control">
+          
+          <select id="sistema" name="sistema" __migrate_field="tipo_contenido" class="form-control">
+            <option value="contenidos">CONTENIDOS</option>
+            <option value="noticias">noticias</option>
+            <option value="actividades">actividades</option>
+            <option value="biblioteca_juridica">BIBLIOTECA_JURIDICA</option>
+            <option value="normas">normas</option>
+            <option value="jurisprudencias">jurisprudencias</option>
+            <option value="recomendaciones">recomendaciones</option>
+            <option value="jurisprudencia_relevante">jurisprudencia_relevante</option>
+            <option value="_">_</option>
+            <option value="sentencias_premiadas">sentencias_premiadas</option>
+            <!-- <option value="magistratura">magistratura</option> -->
+          </select>
           <div class="fs11">
             <em>OBSERVATORIO: contenidos: noticias, actividades; biblioteca_juridica: normas, jurisprudencias,
               recomendaciones, jurisprudencia_relevante </em>
-          </div>
-          <div class="fs11">
-            <em>MAGISTRATURA: contenidos: noticias, comunicados </em>
           </div>
         </div>
         <hr class="wp100">
         <div class="flex justify-around wp100">
           <button __migrate class="btn btn-md bg-primary--40 br-a br-info text-eee">MIGRAR MÓDULO -
             TipoContenido</button>
-          <button __migrate_full class="btn btn-md bg-danger--40 br-a br-greyer text-eee hide">MIGRAR TODO</button>
+          <!-- <button __migrate_full class="btn btn-md bg-danger--40 br-a br-greyer text-eee hide">MIGRAR TODO</button> -->
         </div>
         <div __migrate_msg class="p10 mt20 hide wp100 text-center"></div>
       </div>
@@ -50,9 +59,6 @@ ob_start(); ?>
     let ctxG = {
       rutabase: xyzFuns.urlRestApiWP + 'cont/v1',
       content: '#wrap_migrate',
-      modulos: {
-        magistratura: ['contenidos']
-      }
       
     }
 
@@ -61,7 +67,7 @@ ob_start(); ?>
         
       },
       migrateTables: () => {
-        let tipo_contenido = $("[__migrate_field=tipo_contenido]").val();
+        // let tipo_contenido = $("[__migrate_field=tipo_contenido]").val();
         $("[__migrate_msg]").addClass("hide");
         funs.spinner();
         let objSend = xyzFuns.getData__fields('__migrate_field');

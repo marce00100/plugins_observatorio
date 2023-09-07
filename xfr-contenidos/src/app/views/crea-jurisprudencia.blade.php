@@ -33,7 +33,7 @@ ob_start();
 		background: #FFF;
 		width: auto !important;
 		max-width: 900px !important;
-		margin: 100px auto;
+		margin: 100px auto !important;
 	}
 
   /* Oculta la cabecera de la tabla el TH */
@@ -717,7 +717,7 @@ ob_start();
       },
       /** Para  nuevo muestramodal vacio */
       nuevo: () => {
-        $("#modal [__cabecera_modal] span").html(`Crear Contenido`);
+        $("#modal [__cabecera_modal] span").html(`Crear Jurisprudencia`);
         funs.crearFormulario();
         xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },

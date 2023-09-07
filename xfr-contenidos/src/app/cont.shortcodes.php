@@ -9,11 +9,16 @@ add_shortcode('fr_contenidos', function ($atts, $content) {
   // Fusionar los atributos predeterminados con los atributos proporcionados por el usuario
   $atts = shortcode_atts($default_atts, $atts);
 	global $xfrContenidos;
-	//TODO modificar 
-	if ($atts['tipo_contenido'] != 'sentencias')
-		$html = get_view_contenidos($xfrContenidos, $atts);
-	else
-		$html = get_view_sentencias($xfrContenidos, $atts);
+	$html = get_view_contenidos($xfrContenidos, $atts);
+	return $html;
+});
+
+/**
+ * Editor de contenidos 
+ */
+add_shortcode('fr_contenidos_create', function ($atts, $content) {
+	global $xfrContenidos;
+	$html = get_view_contenidos_create($xfrContenidos);
 	return $html;
 });
 
@@ -32,16 +37,11 @@ add_shortcode('fr_biblioteca_juridica', function ($atts, $content) {
 	return $html;
 });
 
+
+
+
 /**
- * Editor de contenidos tambien tiene la funcion de migraciosn [fr_editorcontenidos]
- */
-add_shortcode('fr_contenidos_create', function ($atts, $content) {
-	global $xfrContenidos;
-	$html = get_view_contenidos_create($xfrContenidos);
-	return $html;
-});
-/**
- * Editor de contenidos tambien tiene la funcion de migraciosn [fr_editorcontenidos]
+ * Editor de la biblioteca juridica
  */
 add_shortcode('fr_normas_create', function ($atts, $content) {
 	global $xfrContenidos;
@@ -64,6 +64,23 @@ add_shortcode('fr_jurisprudencia_relevante_create', function ($atts, $content) {
 	return $html;
 });
 
+
+/**
+ * Muestra las sentencias premiadas 
+ */
+add_shortcode('fr_sentencias_premiadas', function ($atts, $content) {
+	global $xfrContenidos;
+	$html = get_view_sentencias($xfrContenidos);
+	return $html;
+});
+/**
+ * Editor sentencias premiadas
+ */
+add_shortcode('fr_sentencias_premiadas_create', function ($atts, $content) {
+	global $xfrContenidos;
+	$html = get_view_sentencias_premiadas_create($xfrContenidos);
+	return $html;
+});
 
 
 

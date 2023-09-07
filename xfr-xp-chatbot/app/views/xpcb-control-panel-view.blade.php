@@ -12,16 +12,28 @@ ob_start(); ?>
 	<!-- ------------- AGENTE CHATBOT -------------------------------------------->
 	<div id=xp_agente __xpcp_section=acciones class="xp-cp-agente" style="width: 60%; margin: 60px auto; min-height: 70vh;">
 
-		<div class="bg-light darker mb10 p10 br-a br-greyer br8 fs14 text-center">
+		<div class="bg-light darker mb10 p10 br-a br-greyer br8 fs14 ">
 			<div>
-				<h3>Entrenamiento del chatbot</h3>
-				<h4>Se realizará la tokenización de la información (este proceso puede tardar varios minutos)</h4>
+				<h2 class="text-center">Carga de información y entrenamiento del Chatbot</h2>
+			</div>
+			<div>
+				<h3>Carga de información</h3>
+				<h4>Se debe subir un archivo excel con el formato suministrado, para poder llenar la base de datos con la información.</h4>
 				<span>
-					Aseguresé de haber cargado la base de datos, en la tabla xfr_textos, el excel que contiene la información para el chatbot.
+					<input type="file" name="" id="">
 				</span>
 			</div>
-			<div><button __xpcp_accion="entrenar" class="btn btn-info br6 mt20"> Entrenar <i class="fab fa-think-peaks"></i></button></div>
+			<div><button __xpcp_accion="cargarBD" class="btn btn-info br6 mt20"> Cargar la información a la Base de Datos <i class="fab fa-think-peaks"></i></button></div>
 		</div>
+		<div>
+			<h3>Entrenamiento del chatbot</h3>
+			<h4>Se realizará la tokenización de la información (este proceso puede tardar varios minutos)</h4>
+			<span>
+				Aseguresé de haber cargado la base de datos, en la tabla xfr_textos, el excel que contiene la información para el chatbot.
+			</span>
+		</div>
+		<div><button __xpcp_accion="entrenar" class="btn btn-info br6 mt20"> Entrenar <i class="fab fa-think-peaks"></i></button></div>
+	</div>
 	</div>
 </div>
 
@@ -42,6 +54,13 @@ ob_start(); ?>
 					xpcpFuns.alertMsg("[__xpcp_section='acciones'", "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
 				});
 			},
+			cargarBD: () => {
+				console.log('carganfoooo...................');
+				$.get(xpcp.urlApi + 'exportar', {}, function (resp) {
+					xpcpFuns.alertMsgClose();
+					xpcpFuns.alertMsg("[__xpcp_section='acciones'", "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
+				});
+			}
 
 		}
 
@@ -69,6 +88,8 @@ ob_start(); ?>
 				let accion = $(e.currentTarget).attr('__xpcp_accion');
 				if (accion == 'entrenar')
 					xpcp.entrenar();
+				if (accion == 'cargarBD')
+					xpcp.cargarBD();
 			})
 				/** Cuando se hace click en la x de los mensajes de alertas*/
 				.on('click', '.close, .cancel', function (e) {

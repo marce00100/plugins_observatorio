@@ -33,7 +33,7 @@ ob_start();
 		background: #FFF;
 		width: auto !important;
 		max-width: 900px !important;
-		margin: 100px auto;
+		margin: 100px auto!important;
 	}
 
   /* Oculta la cabecera de la tabla el TH */
@@ -696,7 +696,7 @@ ob_start();
       },
       /** Para  nuevo muestramodal vacio */
       nuevo: () => {
-        $("#modal [__cabecera_modal] span").html(`Crear nueva norma`);
+        $("#modal [__cabecera_modal] span").html(`Norma`);
         funs.crearFormulario();
         xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
       },
@@ -716,7 +716,7 @@ ob_start();
           }, 100);
 
           // funs.setData(data);
-          $("#modal [__cabecera_modal] span").html(`Modificar`);
+          $("#modal [__cabecera_modal] span").html(`Modificar Norma`);
           xyzFuns.showModal(ctxG.modal, 'closeOnBgClick' == 'false');
           funs.spinner(false)
         })

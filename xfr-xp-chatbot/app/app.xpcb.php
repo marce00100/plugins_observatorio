@@ -3,6 +3,7 @@
 
 /** CONTROLLERS  */
 require_once $chatbot->path . "app/XpcbController.php"; 
+require_once $chatbot->path . "app/ExcelXpcbController.php"; 
 require_once $chatbot->path . "app/xpcb.routes.php";
 /** VIEWS */
 require_once $chatbot->path . "app/views/xpcb-chatbot-view.blade.php";

@@ -3,6 +3,7 @@
 require_once $xfrContenidos->path . "src/app/FuncionesContenidosController.php"; 
 require_once $xfrContenidos->path . "src/app/ContController.php"; 
 require_once $xfrContenidos->path . "src/app/ContBJController.php"; 
+require_once $xfrContenidos->path . "src/app/ContSentenciasController.php"; 
 
 require_once $xfrContenidos->path . "src/app/CreaBJController.php"; 
 
@@ -15,11 +16,12 @@ require_once $xfrContenidos->path . "src/app/views/cont-contenidos.blade.php";
 require_once $xfrContenidos->path . "src/app/views/cont-biblioteca-juridica.blade.php";
 require_once $xfrContenidos->path . "src/app/views/cont-sentencias.blade.php";
 
-require_once $xfrContenidos->path . "src/app/views/cont-create.blade.php";
+require_once $xfrContenidos->path . "src/app/views/crea-contenidos.blade.php";
 require_once $xfrContenidos->path . "src/app/views/crea-normas.blade.php";
 require_once $xfrContenidos->path . "src/app/views/crea-jurisprudencia.blade.php";
 require_once $xfrContenidos->path . "src/app/views/crea-jurisprudencia_relevante.blade.php";
 require_once $xfrContenidos->path . "src/app/views/crea-recomendaciones.blade.php";
+require_once $xfrContenidos->path . "src/app/views/crea-sentencias-premiadas.blade.php";
 
 require_once $xfrContenidos->path . "src/app/views/cont-migrate.blade.php";
 
