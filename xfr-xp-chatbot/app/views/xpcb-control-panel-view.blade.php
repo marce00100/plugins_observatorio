@@ -12,27 +12,27 @@ ob_start(); ?>
 	<!-- ------------- AGENTE CHATBOT -------------------------------------------->
 	<div id=xp_agente __xpcp_section=acciones class="xp-cp-agente" style="width: 60%; margin: 60px auto; min-height: 70vh;">
 
-		<div class="bg-light darker mb10 p10 br-a br-greyer br8 fs14 ">
-			<div>
-				<h2 class="text-center">Carga de información y entrenamiento del Chatbot</h2>
-			</div>
+		<h2 class="text-center">Configuración del Chatbot</h2>
+		<div class="bg-light darker_ mb10 p10 br-a br-greyer br8 fs14 ">
 			<div>
 				<h3>Carga de información</h3>
 				<h4>Se debe subir un archivo excel con el formato suministrado, para poder llenar la base de datos con la información.</h4>
 				<span>
-					<input type="file" name="" id="">
+					<input type="file" name="" id="" __rg_field="archivo">
 				</span>
 			</div>
-			<div><button __xpcp_accion="cargarBD" class="btn btn-info br6 mt20"> Cargar la información a la Base de Datos <i class="fab fa-think-peaks"></i></button></div>
+			<div class="flex justify-center"><button __xpcp_accion="cargarBD" class="btn btn-success br6 mt20"> Cargar la información a la Base de Datos <i class="fab fa-think-peaks"></i></button></div>
 		</div>
-		<div>
-			<h3>Entrenamiento del chatbot</h3>
-			<h4>Se realizará la tokenización de la información (este proceso puede tardar varios minutos)</h4>
-			<span>
-				Aseguresé de haber cargado la base de datos, en la tabla xfr_textos, el excel que contiene la información para el chatbot.
-			</span>
+		<div class="bg-light darker_ mb10 p10 br-a br-greyer br8 fs14 ">
+			<div  >
+				<h3>Entrenamiento del chatbot</h3>
+				<h4>Se realizará el tratamiento de la información (este proceso puede tardar varios minutos)</h4>
+				<span>
+					Aseguresé de haber cargado la base de datos, con el archivo excel que contiene la información para el chatbot.
+				</span>
+			</div>
+			<div class="flex justify-center"><button __xpcp_accion="entrenar" class="btn btn-info br6 mt20"> Entrenar <i class="fab fa-think-peaks"></i></button></div>
 		</div>
-		<div><button __xpcp_accion="entrenar" class="btn btn-info br6 mt20"> Entrenar <i class="fab fa-think-peaks"></i></button></div>
 	</div>
 	</div>
 </div>
@@ -42,24 +42,54 @@ ob_start(); ?>
 
 <script>
 	jQuery(function ($) {
-		/* xpcp: expert control pannel*/
-		let xpcp = {
-			// urlApi: xyzFuns.urlCoreApi + 'xpcb/',
+
+		let ctxG = {
 			urlApi: xyzFuns.urlRestApiWP + 'xpcb/v1/',
+			content: '[__xpcp_section=acciones]',
+		}
+
+		/* xpcp: expert control pannel*/
+		let xpcp = {		
 
 			entrenar: () => {
-				xpcpFuns.alertMsg("[__xpcp_section='acciones'", "alert-default pastel ", "fas fa-spinner fa-spin fa-3x", "Entrenando...");
-				$.post(xpcp.urlApi + 'training', {}, function (resp) {
+				xpcpFuns.spinner();
+				xpcpFuns.alertMsgClose();
+				xpcpFuns.alertMsg(ctxG.content, "alert-default pastel ", "fas fa-spinner fa-spin fa-3x", "Entrenando... No realice ninguna acción hasta que finalice el proceso");
+				$.post(ctxG.urlApi + 'training', {}, function (resp) {
+					xpcpFuns.spinner(false);
 					xpcpFuns.alertMsgClose();
-					xpcpFuns.alertMsg("[__xpcp_section='acciones'", "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
+					xpcpFuns.alertMsg(ctxG.content, "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
 				});
 			},
 			cargarBD: () => {
-				console.log('carganfoooo...................');
-				$.get(xpcp.urlApi + 'exportar', {}, function (resp) {
-					xpcpFuns.alertMsgClose();
-					xpcpFuns.alertMsg("[__xpcp_section='acciones'", "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
-				});
+				if (!($('[__rg_field=archivo]')[0].files.length > 0)) {
+					return;
+				}
+				xpcpFuns.spinner();
+				xpcpFuns.alertMsgClose();
+				let archivo = $('[__rg_field=archivo]')[0].files[0]
+				let formData = new FormData();
+				formData.append('archivo', archivo);
+				$.ajax({
+            url: ctxG.urlApi + 'cargar-archivo-cb',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (resp) {
+              if (resp.status == 'ok') {
+                xpcpFuns.alertMsgClose();
+								xpcpFuns.alertMsg(ctxG.content, "alert-success pastel ", "fa fa-check fa-3x", resp.msg);
+              }
+            },
+            error: function () {
+              console.log('Error al subir la image_n.');
+            },
+            complete: function (res) {
+              // resp = res.responseJSON;
+              xpcpFuns.spinner(false);
+            } 
+          })
 			}
 
 		}
@@ -78,18 +108,23 @@ ob_start(); ?>
 			},
 
 			alertMsgClose: () => {
-				$("#xp_controlpanel [__alert_msg]").remove();
-			}
+				$(`${ctxG.content}  [__alert_msg]`).remove();
+			},
+			spinner: (obj = {}) => {
+        xyzFuns.spinner(obj, ctxG.content)
+      },
+
 		}
 
 		let xpcpListeners = () => {
-
+			// $("#xp_controlpanel").off('click', "[__xpcp_accion]");
 			$("#xp_controlpanel").on('click', "[__xpcp_accion]", function (e) {
 				let accion = $(e.currentTarget).attr('__xpcp_accion');
 				if (accion == 'entrenar')
 					xpcp.entrenar();
-				if (accion == 'cargarBD')
+				if (accion == 'cargarBD'){
 					xpcp.cargarBD();
+				}
 			})
 				/** Cuando se hace click en la x de los mensajes de alertas*/
 				.on('click', '.close, .cancel', function (e) {

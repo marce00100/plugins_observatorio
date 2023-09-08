@@ -329,6 +329,7 @@ class xpcbController extends MasterController
 	 * Reliza el entrenamiento a partir de los contenidos , se llena la tabla xp_tokens en funcions de la tabla xfr_textos
 	 */
 	public function training() {
+		$timeIni = microtime(true);
 		global $wpdb;
 		# Para evitar un error con $wpdb
 		$wpdb = isset($wpdb) ? $wpdb : (object)[];
@@ -367,6 +368,7 @@ class xpcbController extends MasterController
 		return [
 			'data' => [],
 			'msg' => 'Se realizó el entrenamiento Exitosamente!',
+			'time' => microtime(true) - $timeIni,
 		];
 	}
 

@@ -192,7 +192,7 @@ ob_start();
                 required: true, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {
-                field: 'imagen', type: 'img', label: 'Imagen', placeholder: '', title: '', help: '',
+                field: 'imagen', type: 'img', label: 'Imagen (JPG y PNG)', placeholder: '', title: 'Solamente admite archivos JPG y PNG', help: '',
                 required: false, columns_4: 4, class: { bloque: '', group: 'has-primary_', label: 'form-label', icon: '', input: 'form-input p5 wp100' },
               },
               {

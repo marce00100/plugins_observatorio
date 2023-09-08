@@ -1,15 +1,4 @@
 <?php
-// require_once $xfrContenidos->core_path . 'classes/vendor/maatwebsite/src/facades/Excel';
-
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/PhpOffice/PhpSpreadsheet/Spreadsheet.php';
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/PhpOffice/PhpSpreadsheet/IOFactory.php';
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/PhpOffice/PhpSpreadsheet/Shared/File.php';
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/PhpOffice/PhpSpreadsheet/Reader/Xlsx.php';
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/PhpOffice/PhpSpreadsheet/Reader/BaseReader.php';
-
-// require_once $xfrContenidos->core_path . 'classes/libs/phpspreadsheet/src/PhpSpreadsheet/Xlsx.php';
-
-// use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 // use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -20,231 +9,57 @@ use frctl\MasterController;
 // use FuncionesContenidosController as FuncionesContenidos;
 
 class ExcelXpcbController extends MasterController {
-	/**
-	 * API GET
-	 * 
-	 */
-	public function exportarExcel(WP_REST_Request $req) {
-		$inputFileName = 'd:/archivo.xlsx';
-
-		$spreadsheet = IOFactory::load($inputFileName);
-
-		$worksheet = $spreadsheet->getActiveSheet();
-
-		$data = [];
-
-		foreach ($worksheet->getRowIterator() as $row) {
-			$rowData = [];
-			foreach ($row->getCellIterator() as $cell) {
-				$rowData[] = $cell->getValue();
-			}
-			$data[] = $rowData;
-		}
-
-		return [
-				'data' => $data
-			];
-		echo json_encode($data);
-
-
-			// $titulo = $req['titulo'];
-			// $coleccion = collect([
-			//     ['x' => $titulo, 'y' => 2],
-			//     ['x' => 4, 'y' => 2],
-			//     ['x' => 7, 'y' => 2],
-			//     ['x' => 8, 'y' => 2],
-			// ]);
-
-			// Excel::create('proyecto', function($excel){
-			//     $excel->sheet('ProyPDES-SP', function ($hoja){
-			//         $fila = 1;
-			//         $codDemanda = 0;  
-			//         $color = 0;       
-			//         $cabecera =  ['COD_DEMANDA', 'NOMBRE_PROYECTO', 'SECTOR', 'PILAR', 'META', 'P', 'M', 'R', 'A', 'DESCRIPCION_ACCION', 'INDICADOR_PROCESO', 'ENTIDAD', 'N sisin'];
-			//         $hoja->row( $fila, $cabecera );
-			//         $hoja->row($fila, function($row) { 
-			//             $row->setBackground('#22CC33'); 
-			//             $row->setAlignment('center');
-			//             $row->setFontWeight('bold');
-			//         });
-			//     });
-			// } )->export('xlsx');
-
-			// return Excel::download(new EjemploExport($coleccion), 'marferguer.xlsx');
-			// return Excel::download(new EjemploExport, 'marferguer.xlsx');
-
-
-
-			$spreadsheet = new Spreadsheet();
-			$sheet = $spreadsheet->getActiveSheet();
-			$sheet->setCellValue('A1', 'Hello World !');
-
-			// $writer = new Xlsx($spreadsheet);
-			// $writer->save('hello world.xlsx');
-
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment; filename="ExportForm.xlsx"');
-			header('Cache-Control: max-age=0');
-			$writer = IOFactory::createWriter($spreadsheet, "Xlsx");
-			ob_end_clean(); 
-			$writer->save("php://output");
-			exit;
-	}
 
 	/**
 	 * API POST
 	 * Realiza el cargado de un archivo Excel 
 	 * y la insercion o Borrado  a la BD en una tabla temporal STAGE
 	 */
-	public function cargarArchivo(Request $req) {
-			// return response()->json([
-			//     'time'                  => $this->now(),
-			//     'concert'               =>  date_create_from_format('j/n/Y', '03/15/1999')->format('Y-m-d'),
-			//     'string oso    '        => self::transformaTipo("string", 'oso    '),
-			//     'varchar "" '           => self::transformaTipo("varchar", ''),
-			//     'varchar "INDETERMINADO" '           => self::transformaTipo("varchar", 'INDETERMINADO'),
-			//     'string null '          => self::transformaTipo("string", null),
-			//     'int 3    '             => self::transformaTipo("int", '3     '),
-			//     'integer null '         => self::transformaTipo("integer", null),
-			//     'integer palabra '      => self::transformaTipo("integer", 'palabra'),
-			//     'integer 3.14 '         => self::transformaTipo("integer", '3.14'),
-			//     'int "INDETERMINADO" '  => self::transformaTipo("int", 'INDETERMINADO'),
-			//     'date 3/06/99 '         => self::transformaTipo("date", '3/06/99     '),
-			//     'date      3/06/1999 '  => self::transformaTipo("date", '    3/06/1999     '),
-			//     'date      03/6/1999 ' => self::transformaTipo("date", '    03/06/1999     '),
-			//     'date      03/16/1999 '  => self::transformaTipo("date", '    3/06/1999     '),
-			//     'date   null '          => self::transformaTipo("date", null),
-			//     'date   3 '          => self::transformaTipo("date", 3),
-			//     'date   "" '          => self::transformaTipo("date", ""),
-			// ]);
+	public function cargarArchivo(WP_REST_Request $req) {
+		$timeIni = microtime(true);
 
-			set_time_limit(60 * 60 * 4);
-			$timeIni = microtime(true);
-			$req = (object)$req;
-			$file               = $req->file('archivo');
-			$numHoja            = intval($req->num_hoja) > 0 ? intval($req->num_hoja) : -1;
-			$numFilaStart       = intval($req->num_fila_start) > 0 ? intval($req->num_fila_start) : -1;
-			$numFilaEnd         = intval($req->num_fila_end) > 0 ? intval($req->num_fila_end) : -1;
-			$nombreArchivo      = $file->getClientOriginalName();
-			$extension          = $file->getClientOriginalExtension();        
+		set_time_limit(60 * 60 * 4);
+		$timeIni = microtime(true);
+		$req = (object)$req;
+
+		$file = $_FILES['archivo']['tmp_name'];
 			
-			if (!in_array($extension, ['xls', 'xlsx', 'csv']))
-					return response(['status' => 'error', 'msg' => 'El archivo no es un archivo de tipo Excel.',]);
+			$spreadsheet = IOFactory::load($file);
 
-			$existesNombreArchivo = \DB::select("SELECT * FROM st_felcv_consolidado WHERE nombre_archivo = '{$nombreArchivo}' ");
-			if (count($existesNombreArchivo) > 0 && !isset($req->continuar_carga))
-					return response(['status' => 'alert', 'msg' => 'El nombre del Archivo y sus datos ya fueron cargados.',]);
+			$DB = $this;
+			$DB->statement("DELETE FROM xfr_textos");
+			$DB->statement("ALTER TABLE xfr_textos AUTO_INCREMENT = 1 ");
 
-			$documento = IOFactory::load($file);
-			$totalHojas = $documento->getSheetCount();      
-
-			if($totalHojas < $numHoja || $numHoja <= 0)
-					return response(['status' => 'error', 'msg' => 'El número de hoja no es válido para el archivo.',]);
-
-			$hojaActual = $documento->getSheet($numHoja - 1);
-
-			$letraMayorColumna  = $hojaActual->getHighestColumn(); //valor en Letra A B C
-			$numColumnaMayor    = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($letraMayorColumna);
-			$numFilaEnd         = $numFilaEnd < 0 ? $hojaActual->getHighestRow() : $numFilaEnd; 
-
-			$numFilaEncabezados     = $numFilaStart - 1;
-			$allColumnsExcel        = [];
-			
-			for($colCabecera = 1; $colCabecera <= $numColumnaMayor; $colCabecera++) {
-					$celdaCabecera      = $hojaActual->getCellByColumnAndRow($colCabecera, $numFilaEncabezados)->getValue();
-					$allColumnsExcel[]  = (object)['columna_titulo' => strtolower(trim($celdaCabecera)), 'columna_coord' => $colCabecera];
-			}
-			
-			// $allColumnsExcel = collect($allColumnsExcel);
-			$columnsBd = self::columnasBdRelacionConExcel();
-			$colsBdConCoordExcel    = [];
-			
-			/** Mapea para conseguir la coordenada excel de la columna COlumna A es coord 1*/
-			foreach ($columnsBd as $colBd){
-					$colBd = (object)$colBd;
-					$columnLike_ocurrencia = explode('@', $colBd->columna_like); /** quedara ['edad', 2] es edad 2da instancia o [gestion] si no tiene @*/
-
-					/** SI no tenia @ entonces  count(array) es 1 , se asume entonces que deberia ser la primera instancia. Se agrega la ocurrencia 1*/
-					if (count($columnLike_ocurrencia) == 1) 
-							$columnLike_ocurrencia[1] = 1; 
-					
-					$colsExcelParecidos = [];
-					foreach($allColumnsExcel as $columnaExcel){
-							if(str_contains($columnaExcel->columna_titulo,  $columnLike_ocurrencia[0])){
-									$colsExcelParecidos[] = $columnaExcel;
-									if($columnLike_ocurrencia[1] == 1) break;
-							}
-					}
-
-					if (count($colsExcelParecidos) > 0) {
-								$colBd->col_coord     = $colsExcelParecidos[$columnLike_ocurrencia[1] - 1]->columna_coord; /** el indice 1 es la ocurencia si es primera o segunda, se resta 1 para coincidir con los indices del array parecidos */
-								$colBd->col_titulo    = $colsExcelParecidos[$columnLike_ocurrencia[1] - 1]->columna_titulo;
-								$colsBdConCoordExcel[] = $colBd;                
-					}                                
+			$sheet = $spreadsheet->getSheet($spreadsheet->getFirstSheetIndex());
+			$data = $sheet->toArray();
+			$list = [];
+			for ($i=1; $i < Count($data); $i++) { 
+				$rowArray = $data[$i];
+				if (!empty(trim($rowArray[0]))) {
+					$rowData = (object)[
+						'nivel0'        => trim($rowArray[0]),
+						'nivel1'        => trim($rowArray[1]),
+						'nivel2'        => trim($rowArray[2]),
+						'nivel3'        => trim($rowArray[3]),
+						'nivel1_tags' 	=> trim($rowArray[4]),
+						'nivel2_tags' 	=> trim($rowArray[5]),
+						'nivel3_tags' 	=> trim($rowArray[6]),
+					];
+					$this->guardarObjetoTabla($rowData, 'xfr_textos');
+					$list[] = $rowData;
+				}
 			}
 
-			$arrayRegistros = [];
-			$errores = [];
-
-			## Setea la tabla de Stage y luego Recorre el archivo e Introduce cada fila a la tabla temporal de stage
-			// \DB::statement("TRUNCATE st_felcv_consolidado_stage");
-			// \DB::statement("ALTER SEQUENCE st_felcv_consolidado_stage_id_seq RESTART WITH 1");
-			for ($indexRow = $numFilaStart; $indexRow <= $numFilaEnd; $indexRow++) {
-
-					try {
-							$newRow = [];
-							# se itera los campos de la tabla en BD
-							foreach ($colsBdConCoordExcel as $colBd) {
-									$colBd = (object)$colBd;
-									$cell = $hojaActual->getCellByColumnAndRow($colBd->col_coord, $indexRow);
-									$celdaValor = ($colBd->tipo == 'date') ? $cell->getFormattedValue() : $cell->getValue();
-
-									$newValor = (object)self::transformaTipo($colBd->tipo, $celdaValor);
-									# Si Hay error, lo guarda en el Array
-									if($newValor->error)
-											$errores[] = "Fila: {$indexRow}; En Columna: {$colBd->col_titulo}; El valor: {$celdaValor}, {$newValor->error}";
-
-									$newRow[$colBd->campo] = $newValor->value;
-							}
-							# Datos propios o modificados
-							$newRow['nombre_archivo'] = $nombreArchivo;
-							$newRow['fecha_de_cargado'] = $this->now();
-							$geo = explode(',' , $newRow['latitud'] );
-
-							if (count($geo) == 2 && is_numeric(trim($geo[0])) && is_numeric(trim($geo[1]))){
-									$newRow['latitud']  = trim($geo[0]);
-									$newRow['longitud'] = trim($geo[1]);
-							}
-							else
-									$errores[] = "Fila: " . $indexRow . "= No contiene Latitud y Longitud Validos.";
-
-							## INSERT    
-							\DB::table('st_felcv_consolidado_stage')->insert(($newRow));
-							$arrayRegistros[] = $newRow;
-					} 
-					catch (\Exception $e) {
-							return response([
-									'status' => 'error',
-									'msg'    => 'Error , algo inesperado ha sucedido.' . $e->getMessage(),
-							]);
-					}
-					
-			}
-			
-			$timeFin = microtime(true);
-			$timeExecutionSeg = round($timeFin - $timeIni);
-			
-			return response()->json([
-					'status' => 'ok',    
-					'msg'    => "Se cargaron temporalmente los registros del archivo: {$nombreArchivo} ",        
-					'data'   => [
-							'num_registros_insertados'  => count($arrayRegistros),
-							'num_errores'               => count($errores),
-							'tiempo_ejecucion_seg'      => $timeExecutionSeg,
-							'regs'                      => $arrayRegistros,
-							'errores'                    => $errores,
-					],            
-			]);
+			$totalRegistros = Count($list);
+			return [
+				'status' => 'ok',
+				'msg' => "Se sealizó el registro de {$totalRegistros} filas",
+				'data'=> $list,
+				'registros' => count($list),
+				'time'	 => microtime(true) - $timeIni,
+			];
+	
+	
 	}
 
 	/**

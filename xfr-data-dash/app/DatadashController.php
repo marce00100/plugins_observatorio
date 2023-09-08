@@ -1,4 +1,6 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 use frctl\MasterController;
 
@@ -117,6 +119,62 @@ class DatadashController extends MasterController {
 			'query'     => $query,
 			'configuracionObj' => $cnfDataset
 		];
+	}
+
+
+		/**
+	 * API POST
+	 * Realiza el cargado de un archivo Excel 
+	 * y la insercion o Borrado  a la BD en una tabla temporal STAGE
+	 */
+	public function cargarArchivo(WP_REST_Request $req) {
+		$timeIni = microtime(true);
+
+		set_time_limit(60 * 60 * 4);
+		$timeIni = microtime(true);
+		$req = (object)$req;
+
+		$file = $_FILES['archivo']['tmp_name'];
+			
+			$spreadsheet = IOFactory::load($file);
+
+			$DB = $this;
+			$DB->statement("DELETE FROM xfr_consolidado_feminicidios");
+			$DB->statement("ALTER TABLE xfr_consolidado_feminicidios AUTO_INCREMENT = 1 ");
+
+			$sheet = $spreadsheet->getSheet($spreadsheet->getFirstSheetIndex());
+			$data = $sheet->toArray();
+			$list = [];
+			for ($i=1; $i < Count($data); $i++) { 
+				$rowArray = $data[$i];
+				if (!empty(trim($rowArray[0]))) {
+					$rowData = (object)[
+						'gestion'        => trim($rowArray[0]),
+						'delito'        => trim($rowArray[1]),
+						'sexo_victima'        => trim($rowArray[3]),
+						'edad_victima'        => trim($rowArray[4]),
+						'relacion_victima_agresor'  => trim($rowArray[5]),
+						'numero_hijos' 	=> trim($rowArray[6]),
+						'causa_muerte' 	=> trim($rowArray[7]),
+						'departamento' 	=> trim($rowArray[8]),
+						'municipio' 	=> trim($rowArray[9]),
+						'estado_causa' 	=> trim($rowArray[18]),
+					];
+					$this->guardarObjetoTabla($rowData, 'xfr_consolidado_feminicidios');
+					$list[] = $rowData;
+				}
+			}
+
+			$totalRegistros = Count($list);
+			return [
+				'status' => 'ok',
+				'msg' => "Se sealizó el registro de {$totalRegistros} filas",
+				'data'=> $list,
+				'registros' => count($list),
+				'time'	 => microtime(true) - $timeIni,
+			];
+	
+	
 	}
 
 

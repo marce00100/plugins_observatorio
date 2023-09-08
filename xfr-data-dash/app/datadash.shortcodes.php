@@ -1,6 +1,6 @@
 <?php
 
-/** short para estadistica */
+/** short para estadistica pivot*/
 add_shortcode('dd_estadistica_admin', function ($atts, $content) {
 	global $datadash;
 	$html = get_view_dd_estadistica_admin($datadash);
@@ -15,7 +15,7 @@ add_shortcode('dd_estadistica_public', function ($atts, $content) {
 	return $html;
 });
 
-/** short para estadistica public dashboard*/
+/** short para estadistica public dashboard feminicidios*/
 add_shortcode('dd_indicadores', function ($atts, $content) {
 	global $datadash;
 	$html = get_view_dd_indicadores($datadash);
@@ -27,6 +27,6 @@ add_shortcode('dd_indicadores', function ($atts, $content) {
 /** short para panel control */
 add_shortcode('dd_control_panel', function ($atts, $content) {
 	global $datadash;
-	$html = get_view_dd_control_panel(['datadash_url' => $datadash->url, 'core_url' => $datadash->core_url]);
+	$html = get_view_dd_control_panel($datadash);
 	return $html;
 });

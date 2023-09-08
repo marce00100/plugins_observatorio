@@ -88,12 +88,26 @@ class FuncionesContenidosController extends MasterController {
 		}
 		// Crear una nueva imagen con las dimensiones deseadas
 		$nuevaImagen = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
-		// Cargar la imagen original
-		$imagenOriginal = imagecreatefromjpeg($rutaOriginal);
-		// Redimensionar la imagen original a las nuevas dimensiones
-		imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
-		// Guardar la imagen redimensionada en un archivo
-		imagejpeg($nuevaImagen, $rutaNueva, $calidad);
+
+		$extenson =  pathinfo($rutaOriginal, PATHINFO_EXTENSION);
+		if($extenson == 'jpg') {
+
+			// Cargar la imagen original
+			$imagenOriginal = imagecreatefromjpeg($rutaOriginal);
+			// Redimensionar la imagen original a las nuevas dimensiones
+			imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
+			// Guardar la imagen redimensionada en un archivo
+			imagejpeg($nuevaImagen, $rutaNueva, $calidad);
+		}
+		if($extenson == 'png') {
+
+			// Cargar la imagen original
+			$imagenOriginal = imagecreatefrompng($rutaOriginal);
+			// Redimensionar la imagen original a las nuevas dimensiones
+			imagecopyresampled($nuevaImagen, $imagenOriginal, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $anchoOriginal, $altoOriginal);
+			// Guardar la imagen redimensionada en un archivo
+			imagepng($nuevaImagen, $rutaNueva,9);
+		}
 		// Liberar memoria
 		imagedestroy($nuevaImagen);
 		imagedestroy($imagenOriginal);
